@@ -28,11 +28,9 @@
 
 
 
-
 import React from 'react';
 import './todocard.css';
-import { MdDelete } from 'react-icons/md';
-import { MdTipsAndUpdates } from 'react-icons/md';
+import { MdDelete, MdTipsAndUpdates } from 'react-icons/md';
 
 const TodoCard = ({ title, body, id, delid, onEdit }) => {
   return (
@@ -56,28 +54,22 @@ const TodoCard = ({ title, body, id, delid, onEdit }) => {
       <div className="card-footer">
         <div className="action-buttons">
           <button className="action-btn edit-btn" onClick={onEdit}>
-            <div className="btn-icon">
-              <MdTipsAndUpdates />
-            </div>
+            <div className="btn-icon"><MdTipsAndUpdates /></div>
             <span className="btn-text">Edit</span>
             <div className="btn-shine"></div>
           </button>
-          
           <button className="action-btn delete-btn" onClick={() => delid(id)}>
-            <div className="btn-icon">
-              <MdDelete />
-            </div>
+            <div className="btn-icon"><MdDelete /></div>
             <span className="btn-text">Delete</span>
             <div className="btn-shine"></div>
           </button>
         </div>
-        
         <div className="card-timestamp">
           <div className="timestamp-dot"></div>
-          <span>Task #{id + 1}</span>
+          <span>Task</span>
         </div>
       </div>
-      
+
       <div className="card-glow"></div>
     </div>
   );
