@@ -118,7 +118,7 @@ import Updates from './Updates';
 
 function Dashboard() {
   const [Inputs, setInputs] = useState({ title: '', body: '' });
-  const [Array, setArray] = useState([]);
+  const [todos, setTodos] = useState([]);
   const [showUpdate, setShowUpdate] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState(null);
   const navigate = useNavigate();
@@ -135,8 +135,18 @@ function Dashboard() {
     }
   };
 
+  const fetchTodos = async () => {
+    try {
+      const res = await axios.get('http://localhost:6005/api/todos', { withCredentials: true });
+      setTodos(res.data);
+    } catch (err) {
+      console.error('Error fetching todos', err);
+    }
+  };
+
   useEffect(() => {
     getUser();
+    fetchTodos();
   }, []);
 
   const change = (e) => {
@@ -144,33 +154,48 @@ function Dashboard() {
     setInputs({ ...Inputs, [name]: value });
   };
 
-  const submit = () => {
+  const submit = async () => {
     if (Inputs.title === '' || Inputs.body === '') {
       toast.error('Title Or Body Should not be Empty');
     } else {
-      setArray([...Array, Inputs]);
-      setInputs({ title: '', body: '' });
-      toast.success('Your Task Is Added');
+      try {
+        const res = await axios.post('http://localhost:6005/api/todos', Inputs, { withCredentials: true });
+        setTodos([...todos, res.data]);
+        setInputs({ title: '', body: '' });
+        toast.success('Your Task Is Added');
+      } catch (err) {
+        console.error('Error adding todo', err);
+        toast.error('Failed to add task');
+      }
     }
   };
 
-  const del = (id) => {
-    const updatedArray = [...Array];
-    updatedArray.splice(id, 1);
-    setArray(updatedArray);
+  const del = async (id) => {
+    try {
+      await axios.delete(`http://localhost:6005/api/todos/${id}`, { withCredentials: true });
+      setTodos(todos.filter(todo => todo._id !== id));
+    } catch (err) {
+      console.error('Error deleting todo', err);
+      toast.error('Failed to delete task');
+    }
   };
 
-  const handleEdit = (item, index) => {
-    setSelectedTodo({ ...item, index });
+  const handleEdit = (item) => {
+    setSelectedTodo(item);
     setShowUpdate(true);
   };
 
-  const handleUpdate = (updatedItem) => {
-    const updatedArray = [...Array];
-    updatedArray[selectedTodo.index] = updatedItem;
-    setArray(updatedArray);
-    setShowUpdate(false);
-    toast.success('Task Updated Successfully');
+  const handleUpdate = async (updatedItem) => {
+    try {
+      const res = await axios.put(`http://localhost:6005/api/todos/${selectedTodo._id}`, updatedItem, { withCredentials: true });
+      const updatedTodos = todos.map(todo => (todo._id === selectedTodo._id ? res.data : todo));
+      setTodos(updatedTodos);
+      setShowUpdate(false);
+      toast.success('Task Updated Successfully');
+    } catch (err) {
+      console.error('Error updating todo', err);
+      toast.error('Failed to update task');
+    }
   };
 
   return (
@@ -214,11 +239,6 @@ function Dashboard() {
                   value={Inputs.title}
                   className="modern-input title-input"
                 />
-                <div className="input-icon">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
               </div>
               
               <div className="textarea-wrapper">
@@ -230,21 +250,11 @@ function Dashboard() {
                   className="modern-textarea"
                   rows="4"
                 ></textarea>
-                <div className="textarea-icon">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
-                  </svg>
-                </div>
               </div>
             </div>
             
             <button className="add-button" onClick={submit}>
               <span className="button-text">Add Task</span>
-              <div className="button-icon">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-              </div>
             </button>
           </div>
         </div>
@@ -254,31 +264,26 @@ function Dashboard() {
           <div className="tasks-header">
             <h2 className="section-title">Your Tasks</h2>
             <div className="tasks-count">
-              <span className="count-badge">{Array.length}</span>
+              <span className="count-badge">{todos.length}</span>
               <span className="count-text">Total Tasks</span>
             </div>
           </div>
           
-          {Array.length === 0 ? (
+          {todos.length === 0 ? (
             <div className="empty-state">
-              <div className="empty-icon">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-              </div>
               <h3 className="empty-title">No tasks yet!</h3>
               <p className="empty-subtitle">Create your first task to get started</p>
             </div>
           ) : (
             <div className="tasks-grid">
-              {Array.map((item, index) => (
-                <div className="task-card-wrapper" key={index}>
+              {todos.map((item) => (
+                <div className="task-card-wrapper" key={item._id}>
                   <TodoCard 
                     title={item.title} 
                     body={item.body} 
-                    id={index} 
+                    id={item._id} 
                     delid={del} 
-                    onEdit={() => handleEdit(item, index)} 
+                    onEdit={() => handleEdit(item)} 
                   />
                 </div>
               ))}
