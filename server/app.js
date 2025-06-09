@@ -12,7 +12,7 @@ const Todo = require("./model/Todo");  // 🔧 Yeh line missing hai
 
 
 app.use(cors({
-  origin: ["https://deploy-mern-lwhq.vercel.app"],
+  origin: ["https://todo-ugwc.vercel.app/"],
   methods: ["POST", "GET"],
   credentials: true
 }));
