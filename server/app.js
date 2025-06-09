@@ -8,6 +8,8 @@ const OAuth2Strategy = require("passport-google-oauth2").Strategy;
 const userdb = require("./model/userSchema");
 const connectDB = require('./db/conn');
 const manualAuthRoutes = require("./routes/manualAuthRoutes");
+const Todo = require("./model/Todo");  // 🔧 Yeh line missing hai
+
 
 
 
@@ -167,9 +169,11 @@ app.get("/logout",(req,res,next)=>{
 })
 
 
-app.get("/", (req, res) => {
-  res.send("🎉 Backend is running!");
-});
+
+
+
+
+
 // api
 
 app.post("/api/v2/addTask", (req, res) => {
@@ -177,6 +181,70 @@ app.post("/api/v2/addTask", (req, res) => {
   res.send({ success: true });
 });
 
+
+
+
+//todoAPI
+app.post("/api/todos", async (req, res) => {
+  const { title, body } = req.body;
+  const userEmail = req.user?.email; // from passport session
+
+  if (!userEmail) return res.status(401).send("Not logged in");
+
+  try {
+    const todo = new Todo({ title, body, userEmail });
+    await todo.save();
+    res.status(201).json(todo);
+  } catch (error) {
+    res.status(500).send("Error saving todo");
+  }
+});
+
+
+app.get("/api/todos", async (req, res) => {
+  const userEmail = req.user?.email;
+
+  if (!userEmail) return res.status(401).send("Unauthorized");
+
+  const todos = await Todo.find({ userEmail });
+  res.json(todos);
+});
+
+app.delete("/api/todos/:id", async (req, res) => {
+  const userEmail = req.user?.email;
+
+  try {
+    const todo = await Todo.findOneAndDelete({ _id: req.params.id, userEmail });
+    if (!todo) return res.status(404).send("Not found");
+    res.send("Deleted");
+  } catch {
+    res.status(500).send("Error deleting todo");
+  }
+});
+
+app.put("/api/todos/:id", async (req, res) => {
+  const userEmail = req.user?.email;
+  const { title, body } = req.body;
+
+  try {
+    const todo = await Todo.findOneAndUpdate(
+      { _id: req.params.id, userEmail },
+      { title, body },
+      { new: true }
+    );
+
+    if (!todo) return res.status(404).send("Not found");
+    res.json(todo);
+  } catch {
+    res.status(500).send("Error updating todo");
+  }
+});
+
+
+
+app.get("/", (req, res) => {
+  res.send("🎉 Backend is running!");
+});
 
 
 
