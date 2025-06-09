@@ -167,8 +167,9 @@ app.get("/logout",(req,res,next)=>{
 })
 
 
-
-
+app.get("/", (req, res) => {
+  res.send("🎉 Backend is running!");
+});
 // api
 
 app.post("/api/v2/addTask", (req, res) => {
