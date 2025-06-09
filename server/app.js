@@ -11,7 +11,11 @@ const manualAuthRoutes = require("./routes/manualAuthRoutes");
 const Todo = require("./model/Todo");  // 🔧 Yeh line missing hai
 
 
-
+app.use(cors({
+  origin: ["https://deploy-mern-lwhq.vercel.app"],
+  methods: ["POST", "GET"],
+  credentials: true
+}));
 
 // Connect to MongoDB once at startup
 connectDB()
