@@ -54,7 +54,7 @@ app.use(passport.session());
 passport.use(new OAuth2Strategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "/auth/google/callback", // Use relative URL
+    callbackURL: "https://todo-backend-steel-six.vercel.app/auth/google/callback", // Use relative URL
     passReqToCallback: true,
     scope: ['profile', 'email'] // Ensure the scope includes both 'profile' and 'email'
   }, async (request, accessToken, refreshToken, profile, done) => {
