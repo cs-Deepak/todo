@@ -28,7 +28,7 @@ connectDB()
 
 // Middleware
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "https://todo-ugwc.vercel.app",
   methods: "GET,POST,PUT,DELETE",
   credentials: true
 }));
@@ -110,10 +110,10 @@ app.get("/auth/google", passport.authenticate("google", {
 
 app.get("/auth/google/callback", 
   passport.authenticate("google", {
-    failureRedirect: "http://localhost:5173/login"
+    failureRedirect: "https://todo-ugwc.vercel.app/login"
   }),
   (req, res) => {
-    res.redirect("http://localhost:5173/dashboard");
+    res.redirect("https://todo-ugwc.vercel.app/dashboard");
   }
 );
 
@@ -140,7 +140,7 @@ app.get("/auth/logout", (req, res) => {
         return res.status(500).send("Error during logout.");
       }
       res.clearCookie("connect.sid"); // Clear the session cookie if necessary
-      res.redirect("http://localhost:5173/login"); // Redirect the user to the login page or home page
+      res.redirect("https://todo-ugwc.vercel.app/login"); // Redirect the user to the login page or home page
     });
   });
   
@@ -170,7 +170,7 @@ app.get("/login/success",async(req,res)=>{
 app.get("/logout",(req,res,next)=>{
   req.logOut(function(err){
     if(err){return next(err)}
-    res.redirect("http://localhost:5173");
+    res.redirect("https://todo-ugwc.vercel.app");
   })
 })
 
