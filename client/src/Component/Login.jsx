@@ -7,7 +7,7 @@ import { SiTodoist } from "react-icons/si";
 const Login = () => {
 
     const loginwithgoogle = ()=>{
-        window.open("http://localhost:6005/auth/google/callback","_self")
+        window.open("https://todo-backend-9hds.onrender.com/","_self")
     }
   return (
     <>
