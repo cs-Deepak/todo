@@ -11,9 +11,11 @@ const manualAuthRoutes = require("./routes/manualAuthRoutes");
 const Todo = require("./model/Todo");  // 🔧 Yeh line missing hai
 
 
+
+
 app.use(cors({
-  origin: ["https://todo-ugwc.vercel.app/"],
-  methods: ["POST", "GET"],
+  origin: "https://todo-ugwc.vercel.app/",
+  methods: "GET,POST,PUT,DELETE",
   credentials: true
 }));
 
