@@ -40,11 +40,17 @@ app.use(session({
   secret: process.env.SESSION_SECRET || "1245644298hniyrcoiuqn",
   resave: false,
   saveUninitialized: false,
+  // cookie: {
+  //   secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+  //   httpOnly: true,
+  //   maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  // }
   cookie: {
-    secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
+  secure: process.env.NODE_ENV === "production",
+  httpOnly: true,
+  sameSite: "none", // ⭐ REQUIRED for cross-domain cookies
+  maxAge: 24 * 60 * 60 * 1000
+}
 }));
 
 app.use(passport.initialize());
