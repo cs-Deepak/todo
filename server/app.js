@@ -247,19 +247,16 @@ app.put("/api/todos/:id", async (req, res) => {
 });
 
 
-
 app.get("/", (req, res) => {
-  res.send("🎉 Backend is running!");
+  res.send("🚀 Backend is running!");
 });
-
-
-
 
 // Start Server
 // const PORT = process.env.PORT || 6005;
 // app.listen(PORT, () => {
 //   console.log(`Server started on port ${PORT}`);
 // });
+
 const PORT = process.env.PORT || 6005;
 module.exports = app;
-});
+
