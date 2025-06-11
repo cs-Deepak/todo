@@ -1,108 +1,3 @@
-// import React, { useEffect, useState } from 'react';
-// import axios from 'axios';
-// import { useNavigate } from 'react-router-dom';
-// import './dashboard.css';
-// import TodoCard from '../TodoCard';
-// import { ToastContainer, toast } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
-// import Updates from './Updates';
-
-
-
-// function Dashboard() {
-//   const [Inputs, setInputs] = useState({ title: '', body: '' });
-//   const [Array, setArray] = useState([]);
-//   const [showUpdate, setShowUpdate] = useState(false);
-//   const [selectedTodo, setSelectedTodo] = useState(null);
-//   const navigate = useNavigate();
-
-//   const getUser = async () => {
-//     try {
-//       const response = await axios.get('http://localhost:6005/login/success', {
-//         withCredentials: true,
-//       });
-//       console.log('response', response.data);
-//     } catch (error) {
-//       console.error('Auth failed, redirecting...');
-//       navigate('*');
-//     }
-//   };
-
-//   useEffect(() => {
-//     getUser();
-//   }, []);
-
-//   const change = (e) => {
-//     const { name, value } = e.target;
-//     setInputs({ ...Inputs, [name]: value });
-//   };
-
-//   const submit = () => {
-//     if (Inputs.title === '' || Inputs.body === '') {
-//       toast.error('Title Or Body Should not be Empty');
-//     } else {
-//       setArray([...Array, Inputs]);
-//       setInputs({ title: '', body: '' });
-//       toast.success('Your Task Is Added');
-//     }
-//   };
-
-//   const del = (id) => {
-//     const updatedArray = [...Array];
-//     updatedArray.splice(id, 1);
-//     setArray(updatedArray);
-//   };
-
-//   const handleEdit = (item, index) => {
-//     setSelectedTodo({ ...item, index });
-//     setShowUpdate(true);
-//   };
-
-//   const handleUpdate = (updatedItem) => {
-//     const updatedArray = [...Array];
-//     updatedArray[selectedTodo.index] = updatedItem;
-//     setArray(updatedArray);
-//     setShowUpdate(false);
-//     toast.success('Task Updated Successfully');
-//   };
-
-//   return (
-//     <>
-//       <ToastContainer />
-//       <div style={{ textAlign: 'center' }}>
-//         <h1>Todo</h1>
-//         <div className="conatainer">
-//           <input type="text" placeholder="TITLE" onChange={change} name="title" value={Inputs.title} />
-//           <textarea name="body" placeholder="BODY" onChange={change} value={Inputs.body}></textarea>
-//         </div>
-//         <button className="button-add" onClick={submit}>
-//           Add
-//         </button>
-//       </div>
-//       <div className="todo-body">
-//         <div className="container-todo">
-//           <div className="row">
-//             {Array.map((item, index) => (
-//               <div className="col-lg-3-bg-success mx-5 my-2" key={index}>
-//                 <TodoCard title={item.title} body={item.body} id={index} delid={del} onEdit={() => handleEdit(item, index)} />
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-//       </div>
-
-//       {showUpdate && selectedTodo && (
-//         <div className="todo-update" id="todo-update">
-//           <div className="container">
-//             <Updates todo={selectedTodo} onUpdate={handleUpdate} onClose={() => setShowUpdate(false)} />
-//           </div>
-//         </div>
-//       )}
-//     </>
-//   );
-// }
-
-// export default Dashboard;
 
 
 
@@ -137,7 +32,7 @@ function Dashboard() {
 
   const fetchTodos = async () => {
     try {
-      const res = await axios.get('http://localhost:6005/api/todos', { withCredentials: true });
+      const res = await axios.get('https://todo-backend-steel-six.vercel.app/api/todos', { withCredentials: true });
       setTodos(res.data);
     } catch (err) {
       console.error('Error fetching todos', err);
@@ -159,7 +54,7 @@ function Dashboard() {
       toast.error('Title Or Body Should not be Empty');
     } else {
       try {
-        const res = await axios.post('http://localhost:6005/api/todos', Inputs, { withCredentials: true });
+        const res = await axios.post('https://todo-backend-steel-six.vercel.app/api/todos', Inputs, { withCredentials: true });
         setTodos([...todos, res.data]);
         setInputs({ title: '', body: '' });
         toast.success('Your Task Is Added');
@@ -172,7 +67,7 @@ function Dashboard() {
 
   const del = async (id) => {
     try {
-      await axios.delete(`http://localhost:6005/api/todos/${id}`, { withCredentials: true });
+      await axios.delete(`https://todo-backend-steel-six.vercel.app/api/todos/${id}`, { withCredentials: true });
       setTodos(todos.filter(todo => todo._id !== id));
     } catch (err) {
       console.error('Error deleting todo', err);
@@ -187,7 +82,7 @@ function Dashboard() {
 
   const handleUpdate = async (updatedItem) => {
     try {
-      const res = await axios.put(`http://localhost:6005/api/todos/${selectedTodo._id}`, updatedItem, { withCredentials: true });
+      const res = await axios.put(`https://todo-backend-steel-six.vercel.app/api/todos/${selectedTodo._id}`, updatedItem, { withCredentials: true });
       const updatedTodos = todos.map(todo => (todo._id === selectedTodo._id ? res.data : todo));
       setTodos(updatedTodos);
       setShowUpdate(false);
