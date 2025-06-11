@@ -368,18 +368,39 @@ app.get("/auth/google", passport.authenticate("google", {
 }));
 
 // ✅ Dynamic redirect based on `state`
-app.get("/auth/google/callback",
+// app.get("/auth/google/callback",
+//   passport.authenticate("google", {
+//     failureRedirect: "https://todo-ugwc.vercel.app/login"
+//   }),
+//   (req, res) => {
+//     const redirectBase = req.query.state === "signature"                  // changed here
+//       ? "https://quicksign3.netlify.app/dashboard"
+//       : "https://todo-ugwc.vercel.app/dashboard";
+      
+//     res.redirect(redirectBase);
+//   }
+// );
+
+
+
+
+
+app.get("/auth/google/callback", 
   passport.authenticate("google", {
     failureRedirect: "https://todo-ugwc.vercel.app/login"
   }),
   (req, res) => {
-    const redirectBase = req.query.state === "signature"
-      ? "https://quicksign3.netlify.app/dashboard"
-      : "https://todo-ugwc.vercel.app/dashboard";
-      
-    res.redirect(redirectBase);
+    const referer = req.headers.referer || "";
+
+    // Dynamically redirect based on origin
+    if (referer.includes("quicksign3.netlify.app")) {
+      res.redirect("https://quicksign3.netlify.app/dashboard");
+    } else {
+      res.redirect("https://todo-ugwc.vercel.app/dashboard");
+    }
   }
 );
+
 
 // Get Authenticated User Info
 app.get("/api/user", (req, res) => {
