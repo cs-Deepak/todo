@@ -125,7 +125,7 @@ function Dashboard() {
 
   const getUser = async () => {
     try {
-      const response = await axios.get('http://localhost:6005/login/success', {
+      const response = await axios.get('https://todo-backend-steel-six.vercel.app/login/success', {
         withCredentials: true,
       });
       console.log('response', response.data);
