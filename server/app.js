@@ -14,7 +14,7 @@ const Todo = require("./model/Todo");  // 🔧 Yeh line missing hai
 
 
 app.use(cors({
-  origin: "https://todo-ugwc.vercel.app/",
+  origin: "https://todo-ugwc.vercel.app",
   methods: "GET,POST,PUT,DELETE",
   credentials: true
 }));
