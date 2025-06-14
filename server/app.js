@@ -284,10 +284,9 @@ const Todo = require("./model/Todo");  // ✅ Required for Todo APIs
 
 // ✅ CORS for both apps
 app.use(cors({
-  origin: [
-    "https://todo-ugwc.vercel.app",
-    "https://quicksign3.netlify.app"
-  ],
+  origin:  "https://todo-ugwc.vercel.app",
+    
+
   methods: "GET,POST,PUT,DELETE",
   credentials: true
 }));
