@@ -16,7 +16,7 @@ const Todo = require("./model/Todo");  // ✅ Required for Todo APIs
 
 // ✅ CORS for both apps
 app.use(cors({
-  origin:  "https://todo-ugwc.vercel.app/",
+  origin:  "https://todo-ugwc.vercel.app",
     
 
   methods: "GET,POST,PUT,DELETE",
@@ -241,6 +241,7 @@ app.put("/api/todos/:id", async (req, res) => {
 // Start Server
 const PORT = process.env.PORT || 6005;
 module.exports = app;
+
 
 
 
