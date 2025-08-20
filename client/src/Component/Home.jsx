@@ -1,58 +1,11 @@
-// import React from 'react'
-// import { Link } from "react-router-dom";
-// import "./home.css"
-// import { useNavigate } from 'react-router-dom';
-
-
-// function Home() {
-//   const navigate = useNavigate();
-
-//   const handleClick = () => {
-//     navigate('/login');  // This will send to http://localhost:5173/login
-//   };
-  
-
-//   return (
-//    <>
-//    <div className='main'>
-//     <div className="righheading">
-//     {/* <h1 className='heading'>Welcome </h1> */}
-//     <h1 className='title'>
-//       Track Long-Term <br></br>
-//       Goals and <br></br>
-//       Progress
-//     </h1>
-//     <p className='para'>Make life easier for both you and your team with the top-rated <br></br> task manager and to-do list application in the world.
-//     </p>
-      
-//       <button className='button' on onClick={handleClick}>Try Now</button>
-//         {/* <NavLink to={"/login"}>Login</NavLink> */}
-    
-
-//     </div>
-//     <div className="leftheading">
-//       <img src="\public\img/check.png" alt="check-box" className='check-box'/>
-
-
-//     </div>
-//     </div>
-
-
-
-
-
-//    </>
-//   )
-// }
-
-// export default Home
-
 
 
 import React from 'react';
 import { Link } from "react-router-dom";
 import "./home.css";
 import { useNavigate } from 'react-router-dom';
+import checkImg from '../assets/check.png';
+
 
 function Home() {
   const navigate = useNavigate();
@@ -86,7 +39,7 @@ function Home() {
         
         <div className="leftheading">
           <div className="image-container">
-            <img src="/public/img/check.png" alt="check-box" className='check-box'/>
+            <img src={checkImg} alt="check-box" className='check-box'/>
             <div className="image-overlay"></div>
           </div>
         </div>

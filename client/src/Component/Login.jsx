@@ -24,7 +24,7 @@ const Login = () => {
          */}
          <SiTodoist    className='ligh'/>
 
-           <span style={{fontSize:"100px", padding:"20px", fontWeight:"bolder", color:"white"}}>𝚂𝚞𝚙𝚎𝚛 𝙳𝚊𝚢</span>
+           <span style={{fontSize:"100px", padding:"20px", fontWeight:"bolder", color:"white"}}>Todo</span>
            
            <p style={{fontSize:"25px"}}>Start having a Super Day!</p>
             <div className="form">
