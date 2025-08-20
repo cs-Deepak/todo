@@ -303,7 +303,8 @@ app.use(passport.session());
 
 // ✅ Passport Google Strategy
 passport.use(new OAuth2Strategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
+  // clientID: process.env.GOOGLE_CLIENT_ID,
+  clientID: 700522410432-744u04btph2jn120dpj11eoatfi34hcg.apps.googleusercontent.com,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: "https://todo-5v1r.onrender.com/auth/google/callback", // ⚠️ Render ke URL se replace karna hoga
   passReqToCallback: true,
@@ -478,6 +479,7 @@ const PORT = process.env.PORT || 6005;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
 
 
 
