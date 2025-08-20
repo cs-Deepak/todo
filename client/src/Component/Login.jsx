@@ -22,7 +22,7 @@ const Login = () => {
         <div className="login-page">
         {/* <img src="\public\img/electricity.png" alt="" className='thunder-icon'/> 
          */}
-         <SiTodoist    className='ligh'/>
+         {/* <SiTodoist    className='ligh'/> */}
 
            <span style={{fontSize:"100px", padding:"20px", fontWeight:"bolder", color:"white"}}>Todo</span>
            
