@@ -16,9 +16,7 @@ const Todo = require("./model/Todo");  // ✅ Required for Todo APIs
 
 // ✅ CORS for both apps
 app.use(cors({
-  origin:  "https://todo-ugwc.vercel.app",
-    
-
+  origin: ["https://todo-ugwc.vercel.app", "https://quicksign3.netlify.app"],
   methods: "GET,POST,PUT,DELETE",
   credentials: true
 }));
@@ -32,17 +30,30 @@ app.use("/auth/manual", manualAuthRoutes);
 app.use(express.json());
 
 // Session configuration
+// app.use(session({
+//   secret: process.env.SESSION_SECRET || "1245644298hniyrcoiuqn",
+//   resave: false,
+//   saveUninitialized: false,
+//   cookie: {
+//     secure: process.env.NODE_ENV === "production",
+//     httpOnly: true,
+//     sameSite: "none",
+//     maxAge: 24 * 60 * 60 * 1000
+//   }
+// }));
+
 app.use(session({
   secret: process.env.SESSION_SECRET || "1245644298hniyrcoiuqn",
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === "production",
+    secure: true,       // ✅ production me sahi hai
     httpOnly: true,
-    sameSite: "none",
+    sameSite: "none",   // ✅ cross-site cookie allow karega
     maxAge: 24 * 60 * 60 * 1000
   }
 }));
+
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -241,6 +252,7 @@ app.put("/api/todos/:id", async (req, res) => {
 // Start Server
 const PORT = process.env.PORT || 6005;
 module.exports = app;
+
 
 
 
