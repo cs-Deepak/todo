@@ -305,7 +305,7 @@ app.use(passport.session());
 passport.use(new OAuth2Strategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "https://todo-backend-steel-six.vercel.app/auth/google/callback", // ⚠️ Render ke URL se replace karna hoga
+  callbackURL: "https://todo-5v1r.onrender.com/auth/google/callback", // ⚠️ Render ke URL se replace karna hoga
   passReqToCallback: true,
   scope: ['profile', 'email']
 }, async (request, accessToken, refreshToken, profile, done) => {
@@ -478,6 +478,7 @@ const PORT = process.env.PORT || 6005;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
 
 
 
