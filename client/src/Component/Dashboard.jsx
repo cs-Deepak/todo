@@ -20,7 +20,7 @@ function Dashboard() {
 
   const getUser = async () => {
     try {
-      const response = await axios.get('https://todo-backend-steel-six.vercel.app/login/success', {
+      const response = await axios.get('https://todo-5v1r.onrender.com/login/success', {
         withCredentials: true,
       });
       console.log('response', response.data);
@@ -32,7 +32,7 @@ function Dashboard() {
 
   const fetchTodos = async () => {
     try {
-      const res = await axios.get('https://todo-backend-steel-six.vercel.app/api/todos', { withCredentials: true });
+      const res = await axios.get('https://todo-5v1r.onrender.com/api/todos', { withCredentials: true });
       setTodos(res.data);
     } catch (err) {
       console.error('Error fetching todos', err);
@@ -54,7 +54,7 @@ function Dashboard() {
       toast.error('Title Or Body Should not be Empty');
     } else {
       try {
-        const res = await axios.post('https://todo-backend-steel-six.vercel.app/api/todos', Inputs, { withCredentials: true });
+        const res = await axios.post('https://todo-5v1r.onrender.com/api/todos', Inputs, { withCredentials: true });
         setTodos([...todos, res.data]);
         setInputs({ title: '', body: '' });
         toast.success('Your Task Is Added');
@@ -67,7 +67,7 @@ function Dashboard() {
 
   const del = async (id) => {
     try {
-      await axios.delete(`https://todo-backend-steel-six.vercel.app/api/todos/${id}`, { withCredentials: true });
+      await axios.delete(`https://todo-5v1r.onrender.com/api/todos/${id}`, { withCredentials: true });
       setTodos(todos.filter(todo => todo._id !== id));
     } catch (err) {
       console.error('Error deleting todo', err);
@@ -82,7 +82,7 @@ function Dashboard() {
 
   const handleUpdate = async (updatedItem) => {
     try {
-      const res = await axios.put(`https://todo-backend-steel-six.vercel.app/api/todos/${selectedTodo._id}`, updatedItem, { withCredentials: true });
+      const res = await axios.put(`https://todo-5v1r.onrender.com/api/todos/${selectedTodo._id}`, updatedItem, { withCredentials: true });
       const updatedTodos = todos.map(todo => (todo._id === selectedTodo._id ? res.data : todo));
       setTodos(updatedTodos);
       setShowUpdate(false);
@@ -204,3 +204,4 @@ function Dashboard() {
 }
 
 export default Dashboard;
+
