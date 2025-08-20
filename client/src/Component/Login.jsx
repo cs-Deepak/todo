@@ -3,6 +3,7 @@
 import React from 'react'
 import "./login.css"
 import { SiTodoist } from "react-icons/si";
+import searchIcon from '../assets/search.png'
 
 const Login = () => {
 
@@ -31,7 +32,7 @@ const Login = () => {
               
               <div className='google-login'>
             <button className='google-btn' onClick={loginwithgoogle}>
-                  <img src="/public/img/search.png" alt="" className='google-icon' /> 
+                  <img src={searchIcon} alt="" className='google-icon' /> 
                   <span> Sign In With Google</span>
                 </button>
                 </div>
