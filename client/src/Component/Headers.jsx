@@ -98,7 +98,7 @@ const Header = () => {
 
   const getUser = async () => {
     try {
-      const response = await axios.get("https://todo-backend-steel-six.vercel.app/login/success", { withCredentials: true });
+      const response = await axios.get("https://todo-5v1r.onrender.com/login/success", { withCredentials: true });
       setUserdata(response.data.user)
     } catch (error) {
       console.log("error", error);
@@ -107,7 +107,7 @@ const Header = () => {
 
   // logout function
   const logout = () => {
-    window.open("https://todo-backend-steel-six.vercel.app/logout", "_self")
+    window.open("https://todo-5v1r.onrender.com/logout", "_self")
   }
 
   useEffect(() => {
@@ -170,3 +170,4 @@ const Header = () => {
 };
 
 export default Header;
+
