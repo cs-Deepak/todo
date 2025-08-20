@@ -16,7 +16,7 @@ const Login = () => {
 
 
     const loginwithgoogle = () => {
-  window.open("https://todo-backend-steel-six.vercel.app/auth/google?state=todo", "_self");
+  window.open("https://todo-5v1r.onrender.com/auth/google?state=todo", "_self");
 }
   return (
     <>
@@ -45,3 +45,4 @@ const Login = () => {
 }
 
 export default Login
+
