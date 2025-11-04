@@ -24,7 +24,7 @@ function Dashboard() {
         return;
       }
 
-      const res = await axios.get("https://todo-backend-steel-six.vercel.app/api/todos", {
+      const res = await axios.get("https://todo-server-0ev1.onrender.com/api/todos", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTodos(res.data);
@@ -58,7 +58,7 @@ const submit = async () => {
     const userEmail = localStorage.getItem("userEmail"); // 👈 get user email saved during login
 
     const res = await axios.post(
-      "https://todo-backend-steel-six.vercel.app/api/todos",
+      "https://todo-server-0ev1.onrender.com/api/todos",
       { ...Inputs, userEmail }, // 👈 include userEmail here
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -75,7 +75,7 @@ const submit = async () => {
   const del = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`https://todo-backend-steel-six.vercel.app/api/todos/${id}`, {
+      await axios.delete(`https://todo-server-0ev1.onrender.com/api/todos/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTodos(todos.filter((todo) => todo._id !== id));
@@ -95,7 +95,7 @@ const submit = async () => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.put(
-        `https://todo-backend-steel-six.vercel.app//api/todos/${selectedTodo._id}`,
+        `https://todo-server-0ev1.onrender.com/api/todos/${selectedTodo._id}`,
         updatedItem,
         { headers: { Authorization: `Bearer ${token}` } }
       );
