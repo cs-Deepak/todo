@@ -1,7 +1,53 @@
+// import React, { useState } from 'react';
+// import './updates.css';
+
+// const Updates = ({ todo, onUpdate, onClose }) => {
+//   const [title, setTitle] = useState(todo.title);
+//   const [body, setBody] = useState(todo.body);
+
+//   const handleSubmit = () => {
+//     if (title.trim() === '' || body.trim() === '') {
+//       alert('Title or Body cannot be empty');
+//       return;
+//     }
+//     onUpdate({ title, body });
+//   };
+
+//   return (
+//     <div className="update-container">
+//       <h3>Update Your Task</h3>
+//       <input
+//         type="text"
+//         className="todo-inputs"
+//         value={title}
+//         onChange={(e) => setTitle(e.target.value)}
+//         placeholder="Edit title"
+//       />
+//       <textarea
+//         className="todo-text"
+//         value={body}
+//         onChange={(e) => setBody(e.target.value)}
+//         placeholder="Edit body"
+//       ></textarea>
+
+//       <div className='btn-update'>
+//       <button className="update-btn" onClick={handleSubmit}>
+//         Update
+//       </button>
+//       <button className="update-btn" onClick={onClose} style={{ marginLeft: '10px' }}>
+//         Cancel
+//       </button>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Updates;
+
 
 
 import React, { useState } from 'react';
-import './Updates.css';
+import './updates.css';
 
 const Updates = ({ todo, onUpdate, onClose }) => {
   const [title, setTitle] = useState(todo.title);

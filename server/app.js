@@ -1,491 +1,122 @@
-
-
-
-
-// require("dotenv").config();
-// const express = require("express");
-// const app = express();
-// const cors = require("cors");
-// const session = require("express-session");
-// const passport = require("passport");
-// const OAuth2Strategy = require("passport-google-oauth2").Strategy;
-// const userdb = require("./model/userSchema");
-// const connectDB = require('./db/conn');
-// const manualAuthRoutes = require("./routes/manualAuthRoutes");
-// const Todo = require("./model/Todo");  // ✅ Required for Todo APIs
-
-// // ✅ CORS for both apps
-// app.use(cors({
-//   origin: ["https://todo-ugwc.vercel.app", "https://quicksign3.netlify.app"],
-//   methods: "GET,POST,PUT,DELETE",
-//   credentials: true
-// }));
-
-// // Connect to MongoDB once at startup
-// connectDB()
-//   .then(() => console.log("MongoDB connected successfully"))
-//   .catch(err => console.error("MongoDB connection error:", err));
-
-// app.use("/auth/manual", manualAuthRoutes);
-// app.use(express.json());
-
-// // Session configuration
-// // app.use(session({
-// //   secret: process.env.SESSION_SECRET || "1245644298hniyrcoiuqn",
-// //   resave: false,
-// //   saveUninitialized: false,
-// //   cookie: {
-// //     secure: process.env.NODE_ENV === "production",
-// //     httpOnly: true,
-// //     sameSite: "none",
-// //     maxAge: 24 * 60 * 60 * 1000
-// //   }
-// // }));
-
-// app.use(session({
-//   secret: process.env.SESSION_SECRET || "1245644298hniyrcoiuqn",
-//   resave: false,
-//   saveUninitialized: false,
-//   cookie: {
-//     secure: true,       // ✅ production me sahi hai
-//     httpOnly: true,
-//     sameSite: "none",   // ✅ cross-site cookie allow karega
-//     maxAge: 24 * 60 * 60 * 1000
-//   }
-// }));
-
-
-// app.use(passport.initialize());
-// app.use(passport.session());
-
-// // ✅ Passport Google Strategy
-// passport.use(new OAuth2Strategy({
-//   clientID: process.env.GOOGLE_CLIENT_ID,
-//   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-//   callbackURL: "https://todo-backend-steel-six.vercel.app/auth/google/callback",
-//   passReqToCallback: true,
-//   scope: ['profile', 'email']
-// }, async (request, accessToken, refreshToken, profile, done) => {
-//   try {
-//     let user = await userdb.findOne({ googleId: profile.id });
-
-//     if (!user) {
-//       user = new userdb({
-//         googleId: profile.id,
-//         displayName: profile.displayName,
-//         email: profile.emails[0].value,
-//         image: profile.photos?.[0]?.value || ''
-//       });
-//       await user.save();
-//     } else {
-//       if (!user.image && profile.photos?.[0]?.value) {
-//         user.image = profile.photos[0].value;
-//         await user.save();
-//       }
-//     }
-
-//     return done(null, user);
-//   } catch (error) {
-//     console.error("Error in OAuth callback:", error);
-//     return done(error, null);
-//   }
-// }));
-
-// passport.serializeUser((user, done) => {
-//   done(null, user.id);
-// });
-
-// passport.deserializeUser(async (id, done) => {
-//   try {
-//     const user = await userdb.findById(id);
-//     done(null, user);
-//   } catch (error) {
-//     done(error, null);
-//   }
-// });
-
-// // Google Auth Routes
-// app.get("/auth/google", passport.authenticate("google", {
-//   scope: ["profile", "email"]
-// }));
-
-// // ✅ Dynamic redirect based on `state`
-// // app.get("/auth/google/callback",
-// //   passport.authenticate("google", {
-// //     failureRedirect: "https://todo-ugwc.vercel.app/login"
-// //   }),
-// //   (req, res) => {
-// //     const redirectBase = req.query.state === "signature"                  // changed here
-// //       ? "https://quicksign3.netlify.app/dashboard"
-// //       : "https://todo-ugwc.vercel.app/dashboard";
-      
-// //     res.redirect(redirectBase);
-// //   }
-// // );
-
-
-
-
-
-// app.get("/auth/google/callback", 
-//   passport.authenticate("google", {
-//     failureRedirect: "https://todo-ugwc.vercel.app/login"
-//   }),
-//   (req, res) => {
-//     const referer = req.headers.referer || "";
-
-//     // Dynamically redirect based on origin
-//     if (referer.includes("quicksign3.netlify.app")) {
-//       res.redirect("https://quicksign3.netlify.app/dashboard");
-//     } else {
-//       res.redirect("https://todo-ugwc.vercel.app/dashboard");
-//     }
-//   }
-// );
-
-
-// // Get Authenticated User Info
-// app.get("/api/user", (req, res) => {
-//   if (req.isAuthenticated()) {
-//     return res.status(200).json({
-//       success: true,
-//       user: req.user
-//     });
-//   }
-//   return res.status(401).json({
-//     success: false,
-//     message: "Not authenticated"
-//   });
-// });
-
-// // Logout
-// app.get("/auth/logout", (req, res) => {
-//   req.logout((err) => {
-//     if (err) {
-//       console.log("Error during logout:", err);
-//       return res.status(500).send("Error during logout.");
-//     }
-//     res.clearCookie("connect.sid");
-//     res.redirect("https://todo-ugwc.vercel.app/login");
-//   });
-// });
-
-// // Extra logout
-// app.get("/logout", (req, res, next) => {
-//   req.logOut(function (err) {
-//     if (err) return next(err);
-//     res.redirect("https://todo-ugwc.vercel.app");
-//   });
-// });
-
-// app.get("/login/success", async (req, res) => {
-//   if (req.user) {
-//     res.status(200).json({ message: "user Login", user: req.user });
-//   } else {
-//     res.status(400).json({ message: "Not Authorized" });
-//   }
-// });
-
-// // Basic route
-// app.get("/", (req, res) => {
-//   res.send("🚀 Backend is running!");
-// });
-
-// // API placeholder
-// app.post("/api/v2/addTask", (req, res) => {
-//   console.log("Request received:", req.body);
-//   res.send({ success: true });
-// });
-
-// // Todo CRUD APIs
-// app.post("/api/todos", async (req, res) => {
-//   const { title, body } = req.body;
-//   const userEmail = req.user?.email;
-//   if (!userEmail) return res.status(401).send("Not logged in");
-
-//   try {
-//     const todo = new Todo({ title, body, userEmail });
-//     await todo.save();
-//     res.status(201).json(todo);
-//   } catch (error) {
-//     res.status(500).send("Error saving todo");
-//   }
-// });
-
-// app.get("/api/todos", async (req, res) => {
-//   const userEmail = req.user?.email;
-//   if (!userEmail) return res.status(401).send("Unauthorized");
-
-//   const todos = await Todo.find({ userEmail });
-//   res.json(todos);
-// });
-
-// app.delete("/api/todos/:id", async (req, res) => {
-//   const userEmail = req.user?.email;
-
-//   try {
-//     const todo = await Todo.findOneAndDelete({ _id: req.params.id, userEmail });
-//     if (!todo) return res.status(404).send("Not found");
-//     res.send("Deleted");
-//   } catch {
-//     res.status(500).send("Error deleting todo");
-//   }
-// });
-
-// app.put("/api/todos/:id", async (req, res) => {
-//   const userEmail = req.user?.email;
-//   const { title, body } = req.body;
-
-//   try {
-//     const todo = await Todo.findOneAndUpdate(
-//       { _id: req.params.id, userEmail },
-//       { title, body },
-//       { new: true }
-//     );
-//     if (!todo) return res.status(404).send("Not found");
-//     res.json(todo);
-//   } catch {
-//     res.status(500).send("Error updating todo");
-//   }
-// });
-
-// // Start Server
-// const PORT = process.env.PORT || 6005;
-// module.exports = app;
-
-
-
-
-// today new updated 
-
 require("dotenv").config();
 const express = require("express");
-const app = express();
 const cors = require("cors");
-const session = require("express-session");
-const passport = require("passport");
-const OAuth2Strategy = require("passport-google-oauth2").Strategy;
-const userdb = require("./model/userSchema");
-const connectDB = require('./db/conn');
+const jwt = require("jsonwebtoken");
+const connectDB = require("./db/conn");
 const manualAuthRoutes = require("./routes/manualAuthRoutes");
-const Todo = require("./model/Todo");  // ✅ Required for Todo APIs
+const Todo = require("./model/Todo");
 
-// ✅ CORS for both apps
-app.use(cors({
-  origin: ["https://todo-ugwc.vercel.app", "https://quicksign3.netlify.app"],
-  methods: "GET,POST,PUT,DELETE",
-  credentials: true
-}));
+const app = express();
 
-// Connect to MongoDB once at startup
+// ✅ Connect MongoDB
 connectDB()
   .then(() => console.log("MongoDB connected successfully"))
-  .catch(err => console.error("MongoDB connection error:", err));
+  .catch((err) => console.error("MongoDB connection error:", err));
 
-app.use("/auth/manual", manualAuthRoutes);
+// ✅ Middleware
+app.use(cors({
+  origin: "https://todo-ugwc.vercel.app",
+  methods: "GET,POST,PUT,DELETE",
+  credentials: true,
+}));
 app.use(express.json());
 
-// Session configuration
-app.use(session({
-  secret: process.env.SESSION_SECRET || "1245644298hniyrcoiuqn",
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: true,       // ✅ production me sahi hai
-    httpOnly: true,
-    sameSite: "none",   // ✅ cross-site cookie allow karega
-    maxAge: 24 * 60 * 60 * 1000
-  }
-}));
+// ✅ Routes
+app.use("/auth", manualAuthRoutes); // manual login/signup
 
-app.use(passport.initialize());
-app.use(passport.session());
+// ======================================================
+// ✅ JWT Middleware
+// ======================================================
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  if (!authHeader) return res.status(401).json({ message: "No token provided" });
 
-// ✅ Passport Google Strategy
-passport.use(new OAuth2Strategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  // clientID: 700522410432-744u04btph2jn120dpj11eoatfi34hcg.apps.googleusercontent.com,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "https://todo-5v1r.onrender.com/auth/google/callback", // ⚠️ Render ke URL se replace karna hoga
-  passReqToCallback: true,
-  scope: ['profile', 'email']
-}, async (request, accessToken, refreshToken, profile, done) => {
+  const token = authHeader.split(" ")[1]; // "Bearer <token>"
+  if (!token) return res.status(401).json({ message: "Invalid token format" });
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ message: "Invalid or expired token" });
+    req.user = user; // decoded { email }
+    next();
+  });
+};
+
+// ======================================================
+// ✅ Todo APIs (JWT Protected)
+// ======================================================
+
+// ✅ Add new todo
+app.post("/api/todos", verifyToken, async (req, res) => {
   try {
-    let user = await userdb.findOne({ googleId: profile.id });
-
-    if (!user) {
-      user = new userdb({
-        googleId: profile.id,
-        displayName: profile.displayName,
-        email: profile.emails[0].value,
-        image: profile.photos?.[0]?.value || ''
-      });
-      await user.save();
-    } else {
-      if (!user.image && profile.photos?.[0]?.value) {
-        user.image = profile.photos[0].value;
-        await user.save();
-      }
+    const { title, body } = req.body;
+    if (!title || !body) {
+      return res.status(400).json({ message: "Title and body are required" });
     }
 
-    return done(null, user);
-  } catch (error) {
-    console.error("Error in OAuth callback:", error);
-    return done(error, null);
-  }
-}));
-
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await userdb.findById(id);
-    done(null, user);
-  } catch (error) {
-    done(error, null);
-  }
-});
-
-// Google Auth Routes
-app.get("/auth/google", passport.authenticate("google", {
-  scope: ["profile", "email"]
-}));
-
-app.get("/auth/google/callback", 
-  passport.authenticate("google", {
-    failureRedirect: "https://todo-ugwc.vercel.app/login"
-  }),
-  (req, res) => {
-    const referer = req.headers.referer || "";
-
-    // Dynamically redirect based on origin
-    if (referer.includes("quicksign3.netlify.app")) {
-      res.redirect("https://quicksign3.netlify.app/dashboard");
-    } else {
-      res.redirect("https://todo-ugwc.vercel.app/dashboard");
-    }
-  }
-);
-
-// Get Authenticated User Info
-app.get("/api/user", (req, res) => {
-  if (req.isAuthenticated()) {
-    return res.status(200).json({
-      success: true,
-      user: req.user
+    const todo = new Todo({
+      title,
+      body,
+      userEmail: req.user.email, // fetched from JWT
     });
-  }
-  return res.status(401).json({
-    success: false,
-    message: "Not authenticated"
-  });
-});
 
-// Logout
-app.get("/auth/logout", (req, res) => {
-  req.logout((err) => {
-    if (err) {
-      console.log("Error during logout:", err);
-      return res.status(500).send("Error during logout.");
-    }
-    res.clearCookie("connect.sid");
-    res.redirect("https://todo-ugwc.vercel.app/login");
-  });
-});
-
-// Extra logout
-app.get("/logout", (req, res, next) => {
-  req.logOut(function (err) {
-    if (err) return next(err);
-    res.redirect("https://todo-ugwc.vercel.app");
-  });
-});
-
-app.get("/login/success", async (req, res) => {
-  if (req.user) {
-    res.status(200).json({ message: "user Login", user: req.user });
-  } else {
-    res.status(400).json({ message: "Not Authorized" });
-  }
-});
-
-// Basic route
-app.get("/", (req, res) => {
-  res.send("🚀 Backend is running!");
-});
-
-// API placeholder
-app.post("/api/v2/addTask", (req, res) => {
-  console.log("Request received:", req.body);
-  res.send({ success: true });
-});
-
-// Todo CRUD APIs
-app.post("/api/todos", async (req, res) => {
-  const { title, body } = req.body;
-  const userEmail = req.user?.email;
-  if (!userEmail) return res.status(401).send("Not logged in");
-
-  try {
-    const todo = new Todo({ title, body, userEmail });
     await todo.save();
     res.status(201).json(todo);
   } catch (error) {
-    res.status(500).send("Error saving todo");
+    console.error(error);
+    res.status(500).json({ message: "Error saving todo" });
   }
 });
 
-app.get("/api/todos", async (req, res) => {
-  const userEmail = req.user?.email;
-  if (!userEmail) return res.status(401).send("Unauthorized");
-
-  const todos = await Todo.find({ userEmail });
-  res.json(todos);
-});
-
-app.delete("/api/todos/:id", async (req, res) => {
-  const userEmail = req.user?.email;
-
+// ✅ Get all todos for logged-in user
+app.get("/api/todos", verifyToken, async (req, res) => {
   try {
-    const todo = await Todo.findOneAndDelete({ _id: req.params.id, userEmail });
-    if (!todo) return res.status(404).send("Not found");
-    res.send("Deleted");
-  } catch {
-    res.status(500).send("Error deleting todo");
+    const todos = await Todo.find({ userEmail: req.user.email });
+    res.json(todos);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching todos" });
   }
 });
 
-app.put("/api/todos/:id", async (req, res) => {
-  const userEmail = req.user?.email;
-  const { title, body } = req.body;
-
+// ✅ Update todo
+app.put("/api/todos/:id", verifyToken, async (req, res) => {
   try {
+    const { title, body } = req.body;
+
     const todo = await Todo.findOneAndUpdate(
-      { _id: req.params.id, userEmail },
+      { _id: req.params.id, userEmail: req.user.email },
       { title, body },
       { new: true }
     );
-    if (!todo) return res.status(404).send("Not found");
+
+    if (!todo) return res.status(404).json({ message: "Todo not found" });
     res.json(todo);
-  } catch {
-    res.status(500).send("Error updating todo");
+  } catch (error) {
+    res.status(500).json({ message: "Error updating todo" });
   }
 });
 
-// ✅ Start Server for Render
-const PORT = process.env.PORT || 6005;
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+// ✅ Delete todo
+app.delete("/api/todos/:id", verifyToken, async (req, res) => {
+  try {
+    const todo = await Todo.findOneAndDelete({
+      _id: req.params.id,
+      userEmail: req.user.email,
+    });
+
+    if (!todo) return res.status(404).json({ message: "Todo not found" });
+    res.json({ message: "Todo deleted" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting todo" });
+  }
 });
 
+// ======================================================
+// ✅ Root Test Route
+// ======================================================
+app.get("/", (req, res) => {
+  res.send("🎉 Backend running with manual JWT auth (Google OAuth removed)!");
+});
 
-
-
-
-
-
-
-
-
+// ✅ Start Server
+const PORT = process.env.PORT || 6005;
+app.listen(PORT, () => console.log(`🚀 Server started on port ${PORT}`));

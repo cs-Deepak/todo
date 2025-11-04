@@ -1,48 +1,73 @@
-
-
-import React from 'react'
-import "./login.css"
-import { SiTodoist } from "react-icons/si";
-import searchIcon from '../assets/search.png'
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./login.css";
 
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-    // const loginwithgoogle = ()=>{
-    //     window.open("https://todo-backend-steel-six.vercel.app/auth/google/callback","_self")
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        
+    try {
+      const res = await fetch("https://todo-backend-steel-six.vercel.app/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    // }
+      const data = await res.json();
 
+      if (data.success) {
+        // ✅ Save token + user info
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userEmail", data.user.email);
 
-    const loginwithgoogle = () => {
-  window.open("https://todo-5v1r.onrender.com/auth/google?state=todo", "_self");
-}
+        alert("Login successful!");
+        navigate("/dashboard");
+      } else {
+        alert(data.message || "Login failed");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Something went wrong. Please try again later.");
+    }
+  };
+
   return (
-    <>
-        <div className="login-page">
-        {/* <img src="\public\img/electricity.png" alt="" className='thunder-icon'/> 
-         */}
-         {/* <SiTodoist    className='ligh'/> */}
+    <div className="login-page">
+      <h1>Todo</h1>
+      <p>Start having a Super Day!</p>
 
-           <span style={{fontSize:"100px", padding:"20px", fontWeight:"bolder", color:"white"}}>Todo</span>
-           
-           <p style={{fontSize:"25px"}}>Start having a Super Day!</p>
-            <div className="form">
-              
-              <div className='google-login'>
-            <button className='google-btn' onClick={loginwithgoogle}>
-                  <img src={searchIcon} alt="" className='google-icon' /> 
-                  <span> Sign In With Google</span>
-                </button>
-                </div>
-             
-              
-            </div>
-        </div>
-    </>
-  )
-}
+      <form onSubmit={handleSubmit}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-export default Login
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
 
+        <button type="submit">Login</button>
+      </form>
+
+      <p>
+        Don’t have an account?{" "}
+        <a href="/auth/signup" style={{ textDecoration: "underline" }}>
+          Signup
+        </a>
+      </p>
+    </div>
+  );
+};
+
+export default Login;

@@ -27,7 +27,6 @@
 // export default TodoCard;
 
 
-
 import React from 'react';
 import './todocard.css';
 import { MdDelete, MdTipsAndUpdates } from 'react-icons/md';

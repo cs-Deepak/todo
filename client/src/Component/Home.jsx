@@ -5,13 +5,11 @@ import { Link } from "react-router-dom";
 import "./home.css";
 import { useNavigate } from 'react-router-dom';
 import checkImg from '../assets/check.png';
-
-
 function Home() {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate('/login');
+    navigate('/auth/login');
   };
 
   return (
