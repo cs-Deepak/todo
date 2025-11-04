@@ -47,7 +47,7 @@
 
 
 import React, { useState } from 'react';
-import './updates.css';
+import './Updates.css';
 
 const Updates = ({ todo, onUpdate, onClose }) => {
   const [title, setTitle] = useState(todo.title);
