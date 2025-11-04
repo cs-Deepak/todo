@@ -15,7 +15,7 @@ connectDB()
 
 // ✅ Middleware
 app.use(cors({
-  origin: "https://todo-ugwc.vercel.app",
+  origin: "https://todo-1-6mzd.onrender.com",
   methods: "GET,POST,PUT,DELETE",
   credentials: true,
 }));
