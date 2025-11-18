@@ -141,14 +141,14 @@ function Home() {
   
     <div class="cta-section">
         <h2 class="cta-title">Ready to Get Organized?</h2>
-        <p class="cta-subtitle">Join thousands of users who are achieving their goals with our powerful todo manager</p>
-        <button class="cta-button" onclick="window.location.href='/auth/login'">
-            <span>Start Free Today</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M5 12h14"></path>
-                <path d="m12 5 7 7-7 7"></path>
+      
+      <button className='button' onClick={handleClick}>
+            <span className='button-text'>Try Now</span>
+            <svg className='button-icon' width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M5 12h14"></path>
+              <path d="m12 5 7 7-7 7"></path>
             </svg>
-        </button>
+          </button>
     </div>
 
       
@@ -160,6 +160,7 @@ function Home() {
 
 
 export default Home;
+
 
 
 
