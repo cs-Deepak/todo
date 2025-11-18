@@ -26,6 +26,13 @@ const Login = () => {
         // Save username so we can show initial in header
         if (data.user?.username) localStorage.setItem("username", data.user.username);
 
+        // notify other parts of the app (Header) that user info changed
+        try {
+          window.dispatchEvent(new Event("user-changed"));
+        } catch (e) {
+          // ignore
+        }
+
         alert("Login successful!");
         navigate("/dashboard");
       } else {
