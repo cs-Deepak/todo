@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./header.css";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { SiTodoist } from "react-icons/si";
 
 const Header = () => {
@@ -10,6 +10,7 @@ const Header = () => {
   const [showProfile, setShowProfile] = useState(false);
   const profileRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     // Check if token exists in localStorage
@@ -20,6 +21,22 @@ const Header = () => {
     setUsername(name);
     setUserEmail(email);
   }, []);
+
+  // Refresh header state on route change or when other parts dispatch `user-changed`
+  useEffect(() => {
+    const refresh = () => {
+      const token = localStorage.getItem("token");
+      setIsLoggedIn(!!token);
+      const name = localStorage.getItem("username") || "";
+      const email = localStorage.getItem("userEmail") || "";
+      setUsername(name);
+      setUserEmail(email);
+    };
+
+    refresh();
+    window.addEventListener("user-changed", refresh);
+    return () => window.removeEventListener("user-changed", refresh);
+  }, [location]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -76,7 +93,7 @@ const Header = () => {
                   <div className="user-avatar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', color: '#4b2e83', fontWeight: 700 }}>
                     {username ? username.charAt(0).toUpperCase() : "U"}
                   </div>
-                  <div className="user-name">{username || "User"}</div>
+                  <div className="user-name">{username ? (username.charAt(0).toUpperCase() + username.slice(1)) : "User"}</div>
                 </button>
 
                 {showProfile && (
@@ -86,7 +103,7 @@ const Header = () => {
                         {username ? username.charAt(0).toUpperCase() : "U"}
                       </div>
                       <div style={{ marginLeft: 12 }}>
-                        <div style={{ fontWeight: 700 }}>{username || 'User'}</div>
+                        <div style={{ fontWeight: 700 }}>{username ? (username.charAt(0).toUpperCase() + username.slice(1)) : 'User'}</div>
                         <div style={{ fontSize: 12, opacity: 0.9 }}>{userEmail}</div>
                       </div>
                     </div>
