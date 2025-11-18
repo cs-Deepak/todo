@@ -16,7 +16,7 @@ const Signup = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch("https://todo-server-0ev1.onrender.com/auth/signup", {
+      const res = await fetch("https://todo-5v1r.onrender.com/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

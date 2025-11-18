@@ -24,7 +24,7 @@ function Dashboard() {
         return;
       }
 
-      const res = await axios.get("https://todo-server-0ev1.onrender.com/api/todos", {
+      const res = await axios.get("https://todo-5v1r.onrender.com/api/todos", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTodos(res.data);
@@ -47,37 +47,38 @@ function Dashboard() {
     setInputs({ ...Inputs, [name]: value });
   };
 
-const submit = async () => {
-  if (Inputs.title === "" || Inputs.body === "") {
-    toast.error("Title or Body should not be empty");
-    return;
-  }
+  const submit = async () => {
+    if (Inputs.title === "" || Inputs.body === "") {
+      toast.error("Title or Body should not be empty");
+      return;
+    }
 
-   try {
-    const token = localStorage.getItem("token");
-    const userEmail = localStorage.getItem("userEmail"); // 👈 get user email saved during login
+    try {
+      const token = localStorage.getItem("token");
+      const userEmail = localStorage.getItem("userEmail"); // 👈 get user email saved during login
 
-    const res = await axios.post(
-      "https://todo-server-0ev1.onrender.com/api/todos",
-      { ...Inputs, userEmail }, // 👈 include userEmail here
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+      const res = await axios.post(
+        "https://todo-5v1r.onrender.com/api/todos",
+        { ...Inputs, userEmail }, // 👈 include userEmail here
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-       setTodos([...todos, res.data]);
-    setInputs({ title: "", body: "" });
-    toast.success("Your Task Is Added");
-  } catch (err) {
-    console.error("Error adding todo", err);
-    toast.error("Failed to add task");
-  }
-};
+      setTodos([...todos, res.data]);
+      setInputs({ title: "", body: "" });
+      toast.success("Your Task Is Added");
+    } catch (err) {
+      console.error("Error adding todo", err);
+      toast.error("Failed to add task");
+    }
+  };
 
   const del = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`https://todo-server-0ev1.onrender.com/api/todos/${id}`, {
+      await axios.delete(`https://todo-5v1r.onrender.com/api/todos/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       setTodos(todos.filter((todo) => todo._id !== id));
       toast.info("Task deleted");
     } catch (err) {
@@ -95,7 +96,7 @@ const submit = async () => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.put(
-        `https://todo-server-0ev1.onrender.com/api/todos/${selectedTodo._id}`,
+        `https://todo-5v1r.onrender.com/api/todos/${selectedTodo._id}`,
         updatedItem,
         { headers: { Authorization: `Bearer ${token}` } }
       );
