@@ -42,8 +42,53 @@ function Home() {
           </div>
         </div>
       </div>
+
+      <section className="features">
+  <h2 className="features-title">Everything You Need To Stay Organized</h2>
+  <p className="features-subtitle">
+    Add tasks, update progress, change status, and manage your work with a simple and powerful interface.
+  </p>
+
+  <div className="features-grid">
+
+    <div className="feature-card">
+      <h3>Add Tasks Instantly</h3>
+      <p>
+        Quickly add new todos with a clean and simple input box.  
+        Plan your day in seconds, not minutes.
+      </p>
+    </div>
+
+    <div className="feature-card">
+      <h3>Update & Edit Anytime</h3>
+      <p>
+        Change task titles or descriptions anytime without losing data.  
+        Edit smoothly with our flexible editor.
+      </p>
+    </div>
+
+    <div className="feature-card">
+      <h3>Status Management</h3>
+      <p>
+        Track where your tasks stand in real-time with three powerful modes:  
+        <strong>Completed, In-Process, Incomplete</strong>.
+      </p>
+    </div>
+
+    <div className="feature-card">
+      <h3>Delete With One Click</h3>
+      <p>
+        Clean your workspace by deleting finished or unnecessary tasks  
+        in a fast and easy way.
+      </p>
+    </div>
+
+  </div>
+</section>
+
     </>
   );
 }
+
 
 export default Home;
