@@ -193,6 +193,77 @@ body {
   pointer-events: none;
 }
 
+
+
+
+/* ---------- Features Section ---------- */
+
+.features {
+  width: 100%;
+  padding: 60px 20px;
+  background: #f8f9fc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.features-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #1f1f1f;
+}
+
+.features-subtitle {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 40px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 25px;
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 10px;
+}
+
+.feature-card {
+  background: white;
+  padding: 25px;
+  border-radius: 18px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  transition: 0.3s ease;
+  border: 1px solid #eaeaea;
+}
+
+.feature-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+.feature-card h3 {
+  font-size: 1.35rem;
+  margin-bottom: 10px;
+  color: #222;
+}
+
+.feature-card p {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .features-title {
+    font-size: 2rem;
+  }
+}
+
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .main {
@@ -279,4 +350,5 @@ body {
   .check-box {
     transition: none;
   }
+
 }
