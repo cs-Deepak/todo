@@ -16,7 +16,7 @@ const Signup = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch("https://todo-5v1r.onrender.com/auth/signup", {
+      const res = await fetch("https://todo-5v1r.onrender.com/#/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -26,7 +26,7 @@ const Signup = () => {
 
       if (data.success) {
         alert("Signup successful ✅");
-        window.location.href = "/auth/login";
+        window.location.href = "#/auth/login";
       } else {
         alert(data.message || "Signup failed ❌");
       }
@@ -65,7 +65,7 @@ const Signup = () => {
       </form>
 
       <p>
-        Already have an account? <a href="/auth/login">Login</a>
+        Already have an account? <a href="#/auth/login">Login</a>
       </p>
     </div>
   );
