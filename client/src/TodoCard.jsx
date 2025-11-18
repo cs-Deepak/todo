@@ -31,7 +31,7 @@ import React from 'react';
 import './todocard.css';
 import { MdDelete, MdTipsAndUpdates } from 'react-icons/md';
 
-const TodoCard = ({ title, body, id, delid, onEdit }) => {
+const TodoCard = ({ title, body, id, delid, onEdit, status, onStatusChange }) => {
   return (
     <div className="modern-todo-card">
       <div className="card-header">
@@ -42,14 +42,14 @@ const TodoCard = ({ title, body, id, delid, onEdit }) => {
           <div className="menu-dot"></div>
         </div>
       </div>
-      
+
       <div className="card-content">
         <h4 className="card-title">{title}</h4>
         <p className="card-description">
           {body.length > 75 ? body.substring(0, 75) + '...' : body}
         </p>
       </div>
-      
+
       <div className="card-footer">
         <div className="action-buttons">
           <button className="action-btn edit-btn" onClick={onEdit}>
@@ -65,12 +65,25 @@ const TodoCard = ({ title, body, id, delid, onEdit }) => {
         </div>
         <div className="card-timestamp">
           <div className="timestamp-dot"></div>
-          <span>Task</span>
+          <span className="status-label">{status || 'incomplete'}</span>
         </div>
       </div>
 
+      <div style={{ padding: '0 16px 16px' }}>
+        <label style={{ fontSize: 12, color: '#666' }}>Status:</label>
+        <select
+          value={status || 'incomplete'}
+          onChange={(e) => onStatusChange && onStatusChange(id, e.target.value)}
+          style={{ marginLeft: 8, padding: '6px 8px', borderRadius: 6 }}
+        >
+          <option value="incomplete">Incomplete</option>
+          <option value="in-progress">In-Progress</option>
+          <option value="complete">Complete</option>
+        </select>
+      </div>
+
       <div className="card-glow"></div>
-    </div>
+    </div >
   );
 };
 

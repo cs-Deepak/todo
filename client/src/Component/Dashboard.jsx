@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Updates from "./Updates";
 
 function Dashboard() {
-  const [Inputs, setInputs] = useState({ title: "", body: "" });
+  const [Inputs, setInputs] = useState({ title: "", body: "", status: "incomplete" });
   const [todos, setTodos] = useState([]);
   const [showUpdate, setShowUpdate] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState(null);
@@ -59,7 +59,7 @@ function Dashboard() {
 
       const res = await axios.post(
         "https://todo-5v1r.onrender.com/api/todos",
-        { ...Inputs, userEmail }, // 👈 include userEmail here
+        { ...Inputs, userEmail }, // includes title, body, status
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -84,6 +84,25 @@ function Dashboard() {
     } catch (err) {
       console.error("Error deleting todo", err);
       toast.error("Failed to delete task");
+    }
+  };
+
+  // Update status of a todo
+  const updateStatus = async (id, newStatus) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.put(
+        `https://todo-5v1r.onrender.com/api/todos/${id}`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const updatedTodos = todos.map((t) => (t._id === id ? res.data : t));
+      setTodos(updatedTodos);
+      toast.success("Task status updated");
+    } catch (err) {
+      console.error("Error updating status", err);
+      toast.error("Failed to update status");
     }
   };
 
@@ -168,6 +187,14 @@ function Dashboard() {
                   rows="4"
                 ></textarea>
               </div>
+              <div style={{ marginTop: 12, display: 'flex', gap: 8, alignItems: 'center' }}>
+                <label style={{ color: '#666' }}>Status:</label>
+                <select name="status" value={Inputs.status} onChange={change} style={{ padding: '6px 8px', borderRadius: 6 }}>
+                  <option value="incomplete">Incomplete</option>
+                  <option value="in-progress">In-Progress</option>
+                  <option value="complete">Complete</option>
+                </select>
+              </div>
             </div>
             <div className="image-adding">
               <button className="add-button" onClick={submit}>
@@ -181,9 +208,15 @@ function Dashboard() {
         <div className="tasks-section">
           <div className="tasks-header">
             <h2 className="section-title">Your Tasks</h2>
-            <div className="tasks-count">
-              <span className="count-badge">{todos.length}</span>
-              <span className="count-text">Total Tasks</span>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+              <div className="tasks-count">
+                <span className="count-badge">{todos.length}</span>
+                <span className="count-text">Total</span>
+              </div>
+              <div className="tasks-count">
+                <span className="count-badge">{todos.filter(t => t.status === 'complete').length}</span>
+                <span className="count-text">Completed</span>
+              </div>
             </div>
           </div>
 
@@ -204,6 +237,8 @@ function Dashboard() {
                     id={item._id}
                     delid={del}
                     onEdit={() => handleEdit(item)}
+                    status={item.status}
+                    onStatusChange={updateStatus}
                   />
                 </div>
               ))}

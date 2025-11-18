@@ -7,7 +7,8 @@ const jwt = require("jsonwebtoken");
 // ✅ Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
-  if (!authHeader) return res.status(401).json({ message: "No token provided" });
+  if (!authHeader)
+    return res.status(401).json({ message: "No token provided" });
 
   const token = authHeader.split(" ")[1]; // "Bearer token"
   if (!token) return res.status(401).json({ message: "Invalid token" });
@@ -32,10 +33,11 @@ router.get("/", verifyToken, async (req, res) => {
 // ✅ POST new todo
 router.post("/", verifyToken, async (req, res) => {
   try {
-    const { title, body } = req.body;
+    const { title, body, status } = req.body;
     const todo = new Todo({
       title,
       body,
+      status: status || "incomplete",
       userEmail: req.user.email, // fetched from JWT
     });
     await todo.save();
