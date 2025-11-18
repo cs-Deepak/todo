@@ -16,11 +16,15 @@ connectDB()
 // ✅ Middleware
 app.use(
   cors({
-    origin: "https://todo-1-6mzd.onrender.com",
+    origin: [
+      "https://todo-1-6mzd.onrender.com",
+      "https://todo-ugwc.vercel.app"
+    ],
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
 );
+
 app.use(express.json());
 
 // ✅ Routes
@@ -139,3 +143,4 @@ app.get("/", (req, res) => {
 // ✅ Start Server
 const PORT = process.env.PORT || 6005;
 app.listen(PORT, () => console.log(`🚀 Server started on port ${PORT}`));
+
