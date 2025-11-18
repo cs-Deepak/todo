@@ -62,7 +62,7 @@ const Login = () => {
 
       <p>
         Don’t have an account?{" "}
-        <a href="/auth/signup" style={{ textDecoration: "underline" }}>
+        <a href="#/auth/signup" style={{ textDecoration: "underline" }}>
           Signup
         </a>
       </p>
