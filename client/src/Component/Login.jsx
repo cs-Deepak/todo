@@ -23,6 +23,8 @@ const Login = () => {
         // ✅ Save token + user info
         localStorage.setItem("token", data.token);
         localStorage.setItem("userEmail", data.user.email);
+        // Save username so we can show initial in header
+        if (data.user?.username) localStorage.setItem("username", data.user.username);
 
         alert("Login successful!");
         navigate("/dashboard");
