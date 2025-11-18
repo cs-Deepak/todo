@@ -187,14 +187,14 @@ function Dashboard() {
                   rows="4"
                 ></textarea>
               </div>
-              <div style={{ marginTop: 12, display: 'flex', gap: 8, alignItems: 'center' }}>
+              {/* <div style={{ marginTop: 12, display: 'flex', gap: 8, alignItems: 'center' }}>
                 <label style={{ color: '#666' }}>Status:</label>
                 <select name="status" value={Inputs.status} onChange={change} style={{ padding: '6px 8px', borderRadius: 6 }}>
                   <option value="incomplete">Incomplete</option>
                   <option value="in-progress">In-Progress</option>
                   <option value="complete">Complete</option>
                 </select>
-              </div>
+              </div> */}
             </div>
             <div className="image-adding">
               <button className="add-button" onClick={submit}>

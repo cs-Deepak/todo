@@ -47,8 +47,6 @@ h4{
   padding: 7px;
 } */
 
-
-
 /* Modern TodoCard Styles */
 .modern-todo-card {
   background: white;
@@ -67,13 +65,17 @@ h4{
 }
 
 .modern-todo-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.02) 0%, rgba(118, 75, 162, 0.02) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.02) 0%,
+    rgba(118, 75, 162, 0.02) 100%
+  );
   pointer-events: none;
   transition: opacity 0.3s ease;
 }
@@ -111,7 +113,7 @@ h4{
 }
 
 .priority-indicator::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -123,8 +125,13 @@ h4{
 }
 
 @keyframes pulse-glow {
-  0%, 100% { opacity: 0; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .card-menu {
@@ -248,7 +255,12 @@ h4{
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
   transition: left 0.5s ease;
 }
 
@@ -280,8 +292,67 @@ h4{
 }
 
 @keyframes dot-pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.2); opacity: 0.7; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+}
+
+/* Status label styles */
+.status-label {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 0.25px;
+}
+
+.status-incomplete {
+  background: #edf2f7;
+  color: #4a5568;
+  border: 1px solid rgba(74, 85, 104, 0.06);
+}
+
+.status-in-progress {
+  background: linear-gradient(90deg, #fff7ed, #fff3bf);
+  color: #92400e;
+  border: 1px solid rgba(146, 64, 14, 0.08);
+}
+
+.status-complete {
+  background: linear-gradient(90deg, #ecfdf5, #bbf7d0);
+  color: #065f46;
+  border: 1px solid rgba(6, 95, 70, 0.08);
+}
+
+/* Status select styling */
+.status-select {
+  margin-left: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #2d3748;
+  font-weight: 600;
+}
+
+@media (prefers-color-scheme: dark) {
+  .status-select {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.06);
+    color: #e2e8f0;
+  }
+  .status-incomplete {
+    background: rgba(255, 255, 255, 0.02);
+    color: #cbd5e0;
+  }
 }
 
 /* Card Glow Effect */
@@ -291,7 +362,11 @@ h4{
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(102, 126, 234, 0.1) 0%,
+    transparent 70%
+  );
   opacity: 0;
   transition: opacity 0.5s ease;
   pointer-events: none;
@@ -299,8 +374,12 @@ h4{
 }
 
 @keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive Design */
@@ -309,20 +388,20 @@ h4{
     padding: 1.25rem;
     min-height: 180px;
   }
-  
+
   .card-title {
     font-size: 1.1rem;
   }
-  
+
   .card-description {
     font-size: 0.9rem;
   }
-  
+
   .action-buttons {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .action-btn {
     padding: 0.65rem 0.85rem;
     font-size: 0.8rem;
@@ -334,15 +413,15 @@ h4{
     padding: 1rem;
     min-height: 160px;
   }
-  
+
   .card-title {
     font-size: 1rem;
   }
-  
+
   .card-description {
     font-size: 0.85rem;
   }
-  
+
   .btn-text {
     font-size: 0.8rem;
   }
@@ -354,22 +433,22 @@ h4{
     background: rgba(45, 55, 72, 0.9);
     border-color: rgba(255, 255, 255, 0.1);
   }
-  
+
   .card-title {
     background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
+
   .card-description {
     color: #a0aec0;
   }
-  
+
   .menu-dot {
     background: #4a5568;
   }
-  
+
   .modern-todo-card:hover .menu-dot {
     background: #667eea;
   }

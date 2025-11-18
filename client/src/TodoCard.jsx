@@ -65,16 +65,16 @@ const TodoCard = ({ title, body, id, delid, onEdit, status, onStatusChange }) =>
         </div>
         <div className="card-timestamp">
           <div className="timestamp-dot"></div>
-          <span className="status-label">{status || 'incomplete'}</span>
+          <span className={`status-label status-${status || 'incomplete'}`}>{status || 'incomplete'}</span>
         </div>
       </div>
 
       <div style={{ padding: '0 16px 16px' }}>
         <label style={{ fontSize: 12, color: '#666' }}>Status:</label>
         <select
+          className="status-select"
           value={status || 'incomplete'}
           onChange={(e) => onStatusChange && onStatusChange(id, e.target.value)}
-          style={{ marginLeft: 8, padding: '6px 8px', borderRadius: 6 }}
         >
           <option value="incomplete">Incomplete</option>
           <option value="in-progress">In-Progress</option>
