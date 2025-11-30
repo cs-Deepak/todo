@@ -5,11 +5,20 @@
     display: flex;
     flex-direction: column;
     border-left: 1px solid #2d3250;
-    position: fixed;
-    right: 0;
-    top: 0;
-    z-index: 100;
     overflow-y: auto;
+    flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+    .task-details-panel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        z-index: 1001;
+    }
 }
 
 .panel-header {
