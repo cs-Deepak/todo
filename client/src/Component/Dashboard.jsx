@@ -26,7 +26,7 @@ function Dashboard() {
       const token = localStorage.getItem("token");
       if (!token) {
         toast.error("Please login first!");
-        navigate("/login");
+        navigate("/auth/login");
         return;
       }
 
@@ -39,7 +39,7 @@ function Dashboard() {
       if (err.response?.status === 401) {
         toast.error("Session expired, please login again.");
         localStorage.removeItem("token");
-        navigate("/login");
+        navigate("/auth/login");
       }
     }
   };

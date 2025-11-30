@@ -66,7 +66,7 @@ const Header = () => {
         {/* Navigation Links */}
         <div className="header-nav">
           <NavLink to="/" className="nav-item">Home</NavLink>
-          <NavLink to="auth/login" className="nav-item">Dashboard</NavLink>
+          <NavLink to="/dashboard" className="nav-item">Dashboard</NavLink>
         </div>
 
         {/* Auth Section */}

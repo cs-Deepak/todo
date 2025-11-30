@@ -19,8 +19,8 @@ function App() {
 
   return (
     <>
-      {/* Hide header on login/signup/dashboard */}
-      {location.pathname !== '/auth/login' && location.pathname !== '/auth/signup' && location.pathname !== '/dashboard' && <Header />}
+      {/* Hide header on login/signup */}
+      {location.pathname !== '/auth/login' && location.pathname !== '/auth/signup' && <Header />}
 
       <Routes>
         <Route path="/" element={<Home />} />
