@@ -183,6 +183,13 @@
     transform: translateY(-1px);
 }
 
+.auth-button:disabled {
+    background: #4a5568;
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.6;
+}
+
 /* Secure Badge */
 .secure-badge {
     display: flex;

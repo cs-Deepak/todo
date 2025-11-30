@@ -10,6 +10,7 @@ function Login() {
   const [inputs, setInputs] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const change = (e) => {
     const { name, value } = e.target;
@@ -24,12 +25,18 @@ function Login() {
       return;
     }
 
+    setLoading(true);
+
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:6005';
+      console.log('Attempting login to:', `${API_URL}/auth/login`);
+
       const res = await axios.post(
         `${API_URL}/auth/login`,
         inputs
       );
+
+      console.log('Login response:', res.data);
 
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
@@ -44,7 +51,10 @@ function Login() {
       }
     } catch (err) {
       console.error("Login error:", err);
-      toast.error(err.response?.data?.message || "Login failed");
+      const errorMessage = err.response?.data?.message || err.message || "Login failed. Please try again.";
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -118,8 +128,8 @@ function Login() {
           </div>
 
           {/* Submit Button */}
-          <button type="submit" className="auth-button">
-            Log In
+          <button type="submit" className="auth-button" disabled={loading}>
+            {loading ? "Logging in..." : "Log In"}
           </button>
 
           {/* Secure Badge */}
