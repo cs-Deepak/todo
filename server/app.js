@@ -18,7 +18,8 @@ app.use(
   cors({
     origin: [
       "https://todo-1-6mzd.onrender.com",
-      "https://todo-ugwc.vercel.app"
+      "https://todo-ugwc.vercel.app",
+      "http://localhost:5173"
     ],
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
