@@ -162,10 +162,6 @@ function Dashboard() {
       />
 
 
-
-    
-    
-
       <div className="taskflow-dashboard">
         {/* Left Sidebar */}
         <Sidebar activeTab="today" />
