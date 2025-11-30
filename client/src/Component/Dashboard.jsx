@@ -6,12 +6,17 @@ import TodoCard from "../TodoCard";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Updates from "./Updates";
+import Sidebar from "./Sidebar";
+import TaskDetailsPanel from "./TaskDetailsPanel";
+import { MdSearch, MdAdd, MdFilterList, MdPerson } from "react-icons/md";
 
 function Dashboard() {
   const [Inputs, setInputs] = useState({ title: "", body: "", status: "incomplete" });
   const [todos, setTodos] = useState([]);
   const [showUpdate, setShowUpdate] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState(null);
+  const [showTaskDetails, setShowTaskDetails] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const navigate = useNavigate();
 
   // ✅ Fetch Todos (with token)
@@ -55,16 +60,17 @@ function Dashboard() {
 
     try {
       const token = localStorage.getItem("token");
-      const userEmail = localStorage.getItem("userEmail"); // 👈 get user email saved during login
+      const userEmail = localStorage.getItem("userEmail");
 
       const res = await axios.post(
         "https://todo-5v1r.onrender.com/api/todos",
-        { ...Inputs, userEmail }, // includes title, body, status
+        { ...Inputs, userEmail },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setTodos([...todos, res.data]);
-      setInputs({ title: "", body: "" });
+      setInputs({ title: "", body: "", status: "incomplete" });
+      setShowAddModal(false);
       toast.success("Your Task Is Added");
     } catch (err) {
       console.error("Error adding todo", err);
@@ -87,7 +93,6 @@ function Dashboard() {
     }
   };
 
-  // Update status of a todo
   const updateStatus = async (id, newStatus) => {
     try {
       const token = localStorage.getItem("token");
@@ -125,6 +130,7 @@ function Dashboard() {
       );
       setTodos(updatedTodos);
       setShowUpdate(false);
+      setShowTaskDetails(false);
       toast.success("Task Updated Successfully");
     } catch (err) {
       console.error("Error updating todo", err);
@@ -132,120 +138,209 @@ function Dashboard() {
     }
   };
 
+  const handleTaskClick = (task) => {
+    setSelectedTodo(task);
+    setShowTaskDetails(true);
+  };
+
+  // Filter tasks by status
+  const todoTasks = todos.filter((t) => t.status === "incomplete");
+  const inProgressTasks = todos.filter((t) => t.status === "in-progress");
+  const doneTasks = todos.filter((t) => t.status === "complete");
+
   return (
     <>
       <ToastContainer
         position="top-right"
         theme="dark"
         toastStyle={{
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          background: "#5b68f4",
           color: "white",
           borderRadius: "12px",
         }}
       />
 
-      <div className="dashboard-container">
-        {/* Header */}
-        <div className="hero-section">
-          <div className="hero-content">
-            <h1 className="hero-title">
-              <span className="title-gradient">My Todo Dashboard</span>
-            </h1>
-            <p className="hero-subtitle">
-              Organize your tasks with style and efficiency
-            </p>
+      <div className="taskflow-dashboard">
+        {/* Left Sidebar */}
+        <Sidebar activeTab="today" />
+
+        {/* Main Content */}
+        <div className="main-content">
+          {/* Top Bar */}
+          <div className="top-bar">
+            <div className="search-container">
+              <MdSearch className="search-icon" />
+              <input
+                type="text"
+                placeholder="Search tasks, projects, etc..."
+                className="search-input"
+              />
+            </div>
+            <div className="top-bar-actions">
+              <button className="add-task-btn" onClick={() => setShowAddModal(true)}>
+                <MdAdd /> Add Task
+              </button>
+              <div className="user-avatar">
+                <MdPerson />
+              </div>
+            </div>
+          </div>
+
+          {/* Page Header */}
+          <div className="page-header">
+            <div>
+              <h1 className="page-title">Today</h1>
+              <p className="page-subtitle">Here's a look at what's on your plate for today.</p>
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="filters-bar">
+            <div className="filter-group">
+              <button className="filter-btn">
+                Status: All <span className="dropdown-arrow">▼</span>
+              </button>
+              <button className="filter-btn">
+                Priority <span className="dropdown-arrow">▼</span>
+              </button>
+              <button className="filter-btn">
+                Labels <span className="dropdown-arrow">▼</span>
+              </button>
+              <button className="filter-btn">
+                Collaborators <span className="dropdown-arrow">▼</span>
+              </button>
+            </div>
+            <button className="sort-btn">
+              <MdFilterList /> Sort
+            </button>
+          </div>
+
+          {/* Kanban Board */}
+          <div className="kanban-board">
+            {/* To-Do Column */}
+            <div className="kanban-column">
+              <div className="column-header">
+                <h3 className="column-title">To-Do</h3>
+                <span className="column-count">{todoTasks.length}</span>
+              </div>
+              <div className="column-content">
+                {todoTasks.map((task) => (
+                  <TodoCard
+                    key={task._id}
+                    title={task.title}
+                    body={task.body}
+                    id={task._id}
+                    delid={del}
+                    onEdit={() => handleEdit(task)}
+                    status={task.status}
+                    onStatusChange={updateStatus}
+                    onClick={() => handleTaskClick(task)}
+                    priority="medium"
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* In Progress Column */}
+            <div className="kanban-column">
+              <div className="column-header">
+                <h3 className="column-title">In Progress</h3>
+                <span className="column-count">{inProgressTasks.length}</span>
+              </div>
+              <div className="column-content">
+                {inProgressTasks.map((task) => (
+                  <TodoCard
+                    key={task._id}
+                    title={task.title}
+                    body={task.body}
+                    id={task._id}
+                    delid={del}
+                    onEdit={() => handleEdit(task)}
+                    status={task.status}
+                    onStatusChange={updateStatus}
+                    onClick={() => handleTaskClick(task)}
+                    priority="high"
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Done Column */}
+            <div className="kanban-column">
+              <div className="column-header">
+                <h3 className="column-title">Done</h3>
+                <span className="column-count">{doneTasks.length}</span>
+              </div>
+              <div className="column-content">
+                {doneTasks.map((task) => (
+                  <TodoCard
+                    key={task._id}
+                    title={task.title}
+                    body={task.body}
+                    id={task._id}
+                    delid={del}
+                    onEdit={() => handleEdit(task)}
+                    status={task.status}
+                    onStatusChange={updateStatus}
+                    onClick={() => handleTaskClick(task)}
+                    priority="low"
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Add Task */}
-        <div className="input-section">
-          <div className="input-container">
-            <div className="input-header">
-              <h2 className="section-title">Add New Task</h2>
-              <div className="title-underline"></div>
-            </div>
+        {/* Right Sidebar - Task Details */}
+        {showTaskDetails && selectedTodo && (
+          <TaskDetailsPanel
+            task={selectedTodo}
+            onClose={() => setShowTaskDetails(false)}
+            onUpdate={handleUpdate}
+            onDelete={del}
+          />
+        )}
+      </div>
 
-            <div className="form-group">
-              <div className="input-wrapper">
-                <input
-                  type="text"
-                  placeholder="Enter task title..."
-                  onChange={change}
-                  name="title"
-                  value={Inputs.title}
-                  className="modern-input title-input"
-                />
-              </div>
-
-              <div className="textarea-wrapper">
-                <textarea
-                  name="body"
-                  placeholder="Describe your task in detail..."
-                  onChange={change}
-                  value={Inputs.body}
-                  className="modern-textarea"
-                  rows="4"
-                ></textarea>
-              </div>
-              {/* <div style={{ marginTop: 12, display: 'flex', gap: 8, alignItems: 'center' }}>
-                <label style={{ color: '#666' }}>Status:</label>
-                <select name="status" value={Inputs.status} onChange={change} style={{ padding: '6px 8px', borderRadius: 6 }}>
-                  <option value="incomplete">Incomplete</option>
-                  <option value="in-progress">In-Progress</option>
-                  <option value="complete">Complete</option>
-                </select>
-              </div> */}
+      {/* Add Task Modal */}
+      {showAddModal && (
+        <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
+          <div className="add-task-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Add New Task</h2>
+              <button className="close-modal-btn" onClick={() => setShowAddModal(false)}>
+                ×
+              </button>
             </div>
-            <div className="image-adding">
-              <button className="add-button" onClick={submit}>
-                <span className="button-text">Add Task</span>
+            <div className="modal-body">
+              <input
+                type="text"
+                placeholder="Task title..."
+                onChange={change}
+                name="title"
+                value={Inputs.title}
+                className="modal-input"
+              />
+              <textarea
+                name="body"
+                placeholder="Task description..."
+                onChange={change}
+                value={Inputs.body}
+                className="modal-textarea"
+                rows="6"
+              />
+            </div>
+            <div className="modal-footer">
+              <button className="cancel-btn" onClick={() => setShowAddModal(false)}>
+                Cancel
+              </button>
+              <button className="submit-btn" onClick={submit}>
+                Add Task
               </button>
             </div>
           </div>
         </div>
-
-        {/* Task List */}
-        <div className="tasks-section">
-          <div className="tasks-header">
-            <h2 className="section-title">Your Tasks</h2>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-              <div className="tasks-count">
-                <span className="count-badge">{todos.length}</span>
-                <span className="count-text">Total</span>
-              </div>
-              <div className="tasks-count">
-                <span className="count-badge">{todos.filter(t => t.status === 'complete').length}</span>
-                <span className="count-text">Completed</span>
-              </div>
-            </div>
-          </div>
-
-          {todos.length === 0 ? (
-            <div className="empty-state">
-              <h3 className="empty-title">No tasks yet!</h3>
-              <p className="empty-subtitle">
-                Create your first task to get started
-              </p>
-            </div>
-          ) : (
-            <div className="tasks-grid">
-              {todos.map((item) => (
-                <div className="task-card-wrapper" key={item._id}>
-                  <TodoCard
-                    title={item.title}
-                    body={item.body}
-                    id={item._id}
-                    delid={del}
-                    onEdit={() => handleEdit(item)}
-                    status={item.status}
-                    onStatusChange={updateStatus}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+      )}
 
       {/* Update Modal */}
       {showUpdate && selectedTodo && (
@@ -264,3 +359,4 @@ function Dashboard() {
 }
 
 export default Dashboard;
+

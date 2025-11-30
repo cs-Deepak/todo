@@ -29,61 +29,44 @@
 
 import React from 'react';
 import './todocard.css';
-import { MdDelete, MdTipsAndUpdates } from 'react-icons/md';
+import { MdCalendarToday, MdPerson } from 'react-icons/md';
 
-const TodoCard = ({ title, body, id, delid, onEdit, status, onStatusChange }) => {
+const TodoCard = ({ title, body, id, delid, onEdit, status, onStatusChange, onClick, priority = 'medium' }) => {
+  const getPriorityColor = () => {
+    switch (priority) {
+      case 'high': return '#ff6b6b';
+      case 'medium': return '#5b68f4';
+      case 'low': return '#51cf66';
+      default: return '#5b68f4';
+    }
+  };
+
   return (
-    <div className="modern-todo-card">
-      <div className="card-header">
-        <div className="priority-indicator"></div>
-        <div className="card-menu">
-          <div className="menu-dot"></div>
-          <div className="menu-dot"></div>
-          <div className="menu-dot"></div>
-        </div>
-      </div>
+    <div className="kanban-card" onClick={onClick}>
+      <div className="card-priority-bar" style={{ background: getPriorityColor() }}></div>
 
-      <div className="card-content">
-        <h4 className="card-title">{title}</h4>
-        <p className="card-description">
-          {body.length > 75 ? body.substring(0, 75) + '...' : body}
+      <div className="kanban-card-content">
+        <h4 className="kanban-card-title">{title}</h4>
+        <p className="kanban-card-description">
+          {body.length > 100 ? body.substring(0, 100) + '...' : body}
         </p>
-      </div>
 
-      <div className="card-footer">
-        <div className="action-buttons">
-          <button className="action-btn edit-btn" onClick={onEdit}>
-            <div className="btn-icon"><MdTipsAndUpdates /></div>
-            <span className="btn-text">Edit</span>
-            <div className="btn-shine"></div>
-          </button>
-          <button className="action-btn delete-btn" onClick={() => delid(id)}>
-            <div className="btn-icon"><MdDelete /></div>
-            <span className="btn-text">Delete</span>
-            <div className="btn-shine"></div>
-          </button>
+        <div className="kanban-card-tags">
+          <span className="task-tag">UI/UX</span>
+          <span className="task-tag">Design</span>
         </div>
-        <div className="card-timestamp">
-          <div className="timestamp-dot"></div>
-          <span className={`status-label status-${status || 'incomplete'}`}>{status || 'incomplete'}</span>
+
+        <div className="kanban-card-footer">
+          <div className="card-meta">
+            <div className="meta-item">
+              <MdCalendarToday className="meta-icon" />
+              <span className="meta-text">Oct 25</span>
+            </div>
+          </div>
+          <div className="card-avatar">AM</div>
         </div>
       </div>
-
-      <div style={{ padding: '0 16px 16px' }}>
-        <label style={{ fontSize: 12, color: '#666' }}>Status:</label>
-        <select
-          className="status-select"
-          value={status || 'incomplete'}
-          onChange={(e) => onStatusChange && onStatusChange(id, e.target.value)}
-        >
-          <option value="incomplete">Incomplete</option>
-          <option value="in-progress">In-Progress</option>
-          <option value="complete">Complete</option>
-        </select>
-      </div>
-
-      <div className="card-glow"></div>
-    </div >
+    </div>
   );
 };
 
