@@ -1,5 +1,5 @@
 import React from 'react';
-import './sidebar.css';
+import './Sidebar.css';
 import { MdInbox, MdToday, MdUpcoming, MdFolder, MdLabel, MdArchive, MdSettings, MdHelp } from 'react-icons/md';
 import { FaTasks } from 'react-icons/fa';
 import { NavLink } from 'react-router-dom';
