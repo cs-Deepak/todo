@@ -35,7 +35,8 @@ function Dashboard() {
       const res = await axios.get(`${API_URL}/api/todos`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setTodos(res.data);
+      // Ensure todos is always an array
+      setTodos(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Error fetching todos", err);
       if (err.response?.status === 401) {
@@ -100,7 +101,7 @@ function Dashboard() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setTodos(todos.filter((todo) => todo._id !== id));
+      setTodos(Array.isArray(todos) ? todos.filter((todo) => todo._id !== id) : []);
       toast.info("Task deleted");
     } catch (err) {
       console.error("Error deleting todo", err);
@@ -117,7 +118,7 @@ function Dashboard() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      const updatedTodos = todos.map((t) => (t._id === id ? res.data : t));
+      const updatedTodos = Array.isArray(todos) ? todos.map((t) => (t._id === id ? res.data : t)) : [];
       setTodos(updatedTodos);
       toast.success("Task status updated");
     } catch (err) {
@@ -140,9 +141,9 @@ function Dashboard() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      const updatedTodos = todos.map((todo) =>
-        todo._id === selectedTodo._id ? res.data : todo
-      );
+      const updatedTodos = Array.isArray(todos)
+        ? todos.map((todo) => (todo._id === selectedTodo._id ? res.data : todo))
+        : [];
       setTodos(updatedTodos);
       setShowUpdate(false);
       setShowTaskDetails(false);
@@ -158,10 +159,10 @@ function Dashboard() {
     setShowTaskDetails(true);
   };
 
-  // Filter tasks by status
-  const todoTasks = todos.filter((t) => t.status === "incomplete");
-  const inProgressTasks = todos.filter((t) => t.status === "in-progress");
-  const doneTasks = todos.filter((t) => t.status === "complete");
+  // Filter tasks by status - with safety checks
+  const todoTasks = Array.isArray(todos) ? todos.filter((t) => t.status === "incomplete") : [];
+  const inProgressTasks = Array.isArray(todos) ? todos.filter((t) => t.status === "in-progress") : [];
+  const doneTasks = Array.isArray(todos) ? todos.filter((t) => t.status === "complete") : [];
 
   return (
     <>
