@@ -6,12 +6,12 @@ import { FaTasks } from 'react-icons/fa';
 const Sidebar = ({ activeTab = 'today' }) => {
     return (
         <div className="sidebar">
-            <div className="sidebar-header">
-                {/* <div className="logo-container">
+            {/* <div className="sidebar-header">
+                <div className="logo-container">
                     <FaTasks className="logo-icon" />
                     <span className="logo-text">TaskFlow</span>
-                </div> */}
-            </div>
+                </div>
+            </div> */}
 
             <nav className="sidebar-nav">
                 <div className="nav-section">
