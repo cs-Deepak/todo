@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./header.css";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import { SiTodoist } from "react-icons/si";
+import { FaTasks } from "react-icons/fa";
 
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -13,7 +13,6 @@ const Header = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Check if token exists in localStorage
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
     const name = localStorage.getItem("username") || "";
@@ -22,7 +21,6 @@ const Header = () => {
     setUserEmail(email);
   }, []);
 
-  // Refresh header state on route change or when other parts dispatch `user-changed`
   useEffect(() => {
     const refresh = () => {
       const token = localStorage.getItem("token");
@@ -43,10 +41,9 @@ const Header = () => {
     localStorage.removeItem("username");
     localStorage.removeItem("userEmail");
     setIsLoggedIn(false);
-    navigate("/auth/login"); // redirect to login
+    navigate("/auth/login");
   };
 
-  // close profile when clicking outside
   useEffect(() => {
     const onDocClick = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) {
@@ -58,98 +55,61 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="modern-header">
-      <nav className="nav-container">
-        {/* ===== Brand Section ===== */}
-        <div className="brand-section">
-          <div className="brand-content">
-            <SiTodoist className="brand-icon" />
-            <span className="brand-text">Todo</span>
-          </div>
+    <header className="taskflow-header">
+      <nav className="header-container">
+        {/* Brand */}
+        <div className="header-brand">
+          <FaTasks className="brand-logo" />
+          <span className="brand-name">TaskFlow</span>
         </div>
 
-        {/* ===== Navigation ===== */}
-        <div className="nav-section">
-          {isLoggedIn ? (
-            <div className="user-nav">
-              <NavLink to="/" className="nav-link">
-                <span>Home</span>
-              </NavLink>
+        {/* Navigation Links */}
+        <div className="header-nav">
+          <NavLink to="/" className="nav-item">Home</NavLink>
+          <NavLink to="/dashboard" className="nav-item">Dashboard</NavLink>
+        </div>
 
-              <NavLink to="/dashboard" className="nav-link">
-                <span>Todo</span>
-              </NavLink>
-              {/* Profile icon + dropdown */}
+        {/* Auth Section */}
+        <div className="header-actions">
+          {isLoggedIn ? (
+            <div className="user-welcome">
+              <div className="user-avatar-small">
+                {username ? username.charAt(0).toUpperCase() : "U"}
+              </div>
+              <span className="welcome-text">Welcome, {username || "User"}</span>
               <div className="user-menu" ref={profileRef}>
                 <button
-                  className="user-info"
+                  className="menu-toggle"
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowProfile((s) => !s);
                   }}
-                  aria-haspopup="true"
-                  aria-expanded={showProfile}
                 >
-                  <div className="user-avatar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', color: '#4b2e83', fontWeight: 700 }}>
-                    {username ? username.charAt(0).toUpperCase() : "U"}
-                  </div>
-                  <div className="user-name">{username ? (username.charAt(0).toUpperCase() + username.slice(1)) : "User"}</div>
+                  ▼
                 </button>
 
                 {showProfile && (
-                  <div className="profile-panel" role="dialog" aria-label="User profile">
-                    <div className="profile-head">
-                      <div className="user-avatar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', color: '#4b2e83', fontWeight: 700, width: 56, height: 56 }}>
+                  <div className="profile-dropdown">
+                    <div className="profile-header">
+                      <div className="user-avatar-large">
                         {username ? username.charAt(0).toUpperCase() : "U"}
                       </div>
-                      <div style={{ marginLeft: 12 }}>
-                        <div style={{ fontWeight: 700 }}>{username ? (username.charAt(0).toUpperCase() + username.slice(1)) : 'User'}</div>
-                        <div style={{ fontSize: 12, opacity: 0.9 }}>{userEmail}</div>
+                      <div className="user-details">
+                        <div className="user-full-name">{username || "User"}</div>
+                        <div className="user-email-text">{userEmail}</div>
                       </div>
                     </div>
-                    <div style={{ marginTop: 12 }}>
-                      <button className="logout-btn" onClick={handleLogout}>Logout</button>
-                    </div>
+                    <button className="logout-button" onClick={handleLogout}>
+                      Logout
+                    </button>
                   </div>
                 )}
               </div>
             </div>
           ) : (
-            <div className="auth-buttons">
-              <NavLink to="/auth/login" className="login-btn">
-                <svg
-                  className="login-icon"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
-                  />
-                </svg>
-                Login
-              </NavLink>
-
-              {/* <NavLink to="/auth/signup" className="signup-btn">
-                <svg
-                  className="signup-icon"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-                Signup
-              </NavLink> */}
-            </div>
+            <NavLink to="/auth/login" className="signup-button">
+              Login
+            </NavLink>
           )}
         </div>
       </nav>
