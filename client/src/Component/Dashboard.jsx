@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Updates from "./Updates";
 import Sidebar from "./Sidebar";
 import TaskDetailsPanel from "./TaskDetailsPanel";
+import Header from "./Headers";
 import { MdSearch, MdAdd, MdFilterList, MdPerson } from "react-icons/md";
 
 function Dashboard() {
@@ -160,14 +161,19 @@ function Dashboard() {
         }}
       />
 
+
+
+      {/* Header */}
+      <Header />
+
       <div className="taskflow-dashboard">
         {/* Left Sidebar */}
         <Sidebar activeTab="today" />
 
         {/* Main Content */}
         <div className="main-content">
-          {/* Top Bar */}
-          <div className="top-bar">
+          {/* Search and Add Task Bar */}
+          <div className="dashboard-top-bar">
             <div className="search-container">
               <MdSearch className="search-icon" />
               <input
@@ -176,14 +182,9 @@ function Dashboard() {
                 className="search-input"
               />
             </div>
-            <div className="top-bar-actions">
-              <button className="add-task-btn" onClick={() => setShowAddModal(true)}>
-                <MdAdd /> Add Task
-              </button>
-              <div className="user-avatar">
-                <MdPerson />
-              </div>
-            </div>
+            <button className="add-task-btn" onClick={() => setShowAddModal(true)}>
+              <MdAdd /> Add Task
+            </button>
           </div>
 
           {/* Page Header */}
