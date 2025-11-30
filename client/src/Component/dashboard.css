@@ -6,7 +6,8 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   background: #1a1d2e;
   color: #ffffff;
   overflow-x: hidden;
@@ -412,11 +413,9 @@ body {
   .taskflow-dashboard {
     flex-direction: column;
   }
-
+  /* Hide inline sidebar on mobile; use the hamburger to open overlay sidebar */
   .sidebar {
-    width: 100%;
-    height: auto;
-    position: relative;
+    display: none;
   }
 
   .page-header {

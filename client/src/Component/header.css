@@ -45,6 +45,22 @@
   gap: 2rem;
 }
 
+/* Mobile hamburger */
+.hamburger {
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+.hamburger-line {
+  width: 22px;
+  height: 2px;
+  background: #ffffff;
+  display: block;
+  margin: 3px 0;
+}
+
 .nav-item {
   color: #9ca3af;
   text-decoration: none;
@@ -63,7 +79,7 @@
 }
 
 .nav-item.active::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -8px;
   left: 0;
@@ -237,6 +253,9 @@
 
   .header-nav {
     display: none;
+  }
+  .hamburger {
+    display: inline-flex;
   }
 
   .brand-name {

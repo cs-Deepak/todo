@@ -25,8 +25,9 @@ function Login() {
     }
 
     try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:6005';
       const res = await axios.post(
-        "https://todo-5v1r.onrender.com/auth/login",
+        `${API_URL}/auth/login`,
         inputs
       );
 

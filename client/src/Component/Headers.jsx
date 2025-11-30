@@ -54,6 +54,18 @@ const Header = () => {
     return () => document.removeEventListener("click", onDocClick);
   }, []);
 
+  // dispatch a toggle event for mobile sidebar
+  const toggleMobileSidebar = () => {
+    try {
+      window.dispatchEvent(new CustomEvent('sidebar-toggle'));
+    } catch (err) {
+      // fallback for older browsers
+      const event = document.createEvent('Event');
+      event.initEvent('sidebar-toggle', true, true);
+      window.dispatchEvent(event);
+    }
+  };
+
   return (
     <header className="taskflow-header">
       <nav className="header-container">
@@ -65,9 +77,20 @@ const Header = () => {
 
         {/* Navigation Links */}
         <div className="header-nav">
-          <NavLink to="/" className="nav-item">Home</NavLink>
-          <NavLink to="/dashboard" className="nav-item">Dashboard</NavLink>
+          <NavLink to="/" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>Home</NavLink>
+          <NavLink to="/dashboard" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>Dashboard</NavLink>
         </div>
+
+        {/* Mobile hamburger (visible on small screens) */}
+        <button
+          className="hamburger"
+          aria-label="Open menu"
+          onClick={() => toggleMobileSidebar()}
+        >
+          <span className="hamburger-line"></span>
+          <span className="hamburger-line"></span>
+          <span className="hamburger-line"></span>
+        </button>
 
         {/* Auth Section */}
         <div className="header-actions">

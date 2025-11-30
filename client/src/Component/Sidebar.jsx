@@ -1,11 +1,13 @@
 import React from 'react';
-import './Sidebar.css';
+import './sidebar.css';
 import { MdInbox, MdToday, MdUpcoming, MdFolder, MdLabel, MdArchive, MdSettings, MdHelp } from 'react-icons/md';
 import { FaTasks } from 'react-icons/fa';
+import { NavLink } from 'react-router-dom';
 
 const Sidebar = ({ activeTab = 'today' }) => {
     return (
         <div className="sidebar">
+            <button className="mobile-close" onClick={() => { try { window.dispatchEvent(new CustomEvent('sidebar-toggle')); } catch (e) { const ev = document.createEvent('Event'); ev.initEvent('sidebar-toggle', true, true); window.dispatchEvent(ev); } }}>✕</button>
             {/* <div className="sidebar-header">
                 <div className="logo-container">
                     <FaTasks className="logo-icon" />
@@ -14,6 +16,14 @@ const Sidebar = ({ activeTab = 'today' }) => {
             </div> */}
 
             <nav className="sidebar-nav">
+                <div className="mobile-top-links">
+                    <NavLink to="/" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+                        <span className="nav-text">Home</span>
+                    </NavLink>
+                    <NavLink to="/dashboard" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+                        <span className="nav-text">Dashboard</span>
+                    </NavLink>
+                </div>
                 <div className="nav-section">
                     <div className={`nav-item ${activeTab === 'inbox' ? 'active' : ''}`}>
                         <MdInbox className="nav-icon" />

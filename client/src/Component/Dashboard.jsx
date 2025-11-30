@@ -18,6 +18,8 @@ function Dashboard() {
   const [selectedTodo, setSelectedTodo] = useState(null);
   const [showTaskDetails, setShowTaskDetails] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:6005';
   const navigate = useNavigate();
 
   // ✅ Fetch Todos (with token)
@@ -30,7 +32,7 @@ function Dashboard() {
         return;
       }
 
-      const res = await axios.get("https://todo-5v1r.onrender.com/api/todos", {
+      const res = await axios.get(`${API_URL}/api/todos`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTodos(res.data);
@@ -46,7 +48,19 @@ function Dashboard() {
 
   useEffect(() => {
     fetchTodos();
+    const toggleHandler = () => setSidebarOpen(s => !s);
+    window.addEventListener('sidebar-toggle', toggleHandler);
+    return () => window.removeEventListener('sidebar-toggle', toggleHandler);
   }, []);
+
+  useEffect(() => {
+    // prevent body scroll when sidebar overlay is open on mobile
+    if (sidebarOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [sidebarOpen]);
 
   const change = (e) => {
     const { name, value } = e.target;
@@ -64,7 +78,7 @@ function Dashboard() {
       const userEmail = localStorage.getItem("userEmail");
 
       const res = await axios.post(
-        "https://todo-5v1r.onrender.com/api/todos",
+        `${API_URL}/api/todos`,
         { ...Inputs, userEmail },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -82,7 +96,7 @@ function Dashboard() {
   const del = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`https://todo-5v1r.onrender.com/api/todos/${id}`, {
+      await axios.delete(`${API_URL}/api/todos/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -98,7 +112,7 @@ function Dashboard() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.put(
-        `https://todo-5v1r.onrender.com/api/todos/${id}`,
+        `${API_URL}/api/todos/${id}`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -121,7 +135,7 @@ function Dashboard() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.put(
-        `https://todo-5v1r.onrender.com/api/todos/${selectedTodo._id}`,
+        `${API_URL}/api/todos/${selectedTodo._id}`,
         updatedItem,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -164,7 +178,10 @@ function Dashboard() {
 
       <div className="taskflow-dashboard">
         {/* Left Sidebar */}
-        <Sidebar activeTab="today" />
+        <div className={`sidebar-container ${sidebarOpen ? 'open' : ''}`}>
+          <Sidebar activeTab="today" />
+          <button className="sidebar-overlay" onClick={() => setSidebarOpen(false)}></button>
+        </div>
 
         {/* Main Content */}
         <div className="main-content">
