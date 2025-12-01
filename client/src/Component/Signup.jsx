@@ -35,7 +35,14 @@ function Signup() {
     }
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:6005';
+      // Detect production environment and use appropriate API URL
+      const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+      const API_URL = import.meta.env.VITE_API_URL ||
+        (isProduction ? 'https://todo-1-6mzd.onrender.com' : 'http://localhost:6005');
+
+      console.log('Environment:', isProduction ? 'Production' : 'Development');
+      console.log('Attempting signup to:', `${API_URL}/auth/signup`);
+
       const res = await axios.post(
         `${API_URL}/auth/signup`,
         inputs

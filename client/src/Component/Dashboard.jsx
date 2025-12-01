@@ -19,7 +19,14 @@ function Dashboard() {
   const [showTaskDetails, setShowTaskDetails] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:6005';
+
+  // Detect production environment and use appropriate API URL
+  const isProduction = typeof window !== 'undefined' &&
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1';
+  const API_URL = import.meta.env.VITE_API_URL ||
+    (isProduction ? 'https://todo-1-6mzd.onrender.com' : 'http://localhost:6005');
+
   const navigate = useNavigate();
 
   // ✅ Fetch Todos (with token)
