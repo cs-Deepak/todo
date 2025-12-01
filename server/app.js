@@ -14,14 +14,43 @@ connectDB()
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // ✅ Middleware
+// Use a dynamic origin function so we can accept Vercel/Render deployments and local dev
+const allowedClient = (
+  process.env.CLIENT_URL ||
+  process.env.VITE_API_URL ||
+  ""
+).replace(/\/$/, "");
+console.log(
+  "CORS allowedClient:",
+  allowedClient || "not set, using wildcard for .vercel.app and .onrender.com"
+);
 app.use(
   cors({
-    origin: [
-      "https://todo-1-6mzd.onrender.com",
-      "https://todo-ugwc.vercel.app",
-      "http://localhost:5173"
-    ],
-    methods: "GET,POST,PUT,DELETE",
+    origin: function (origin, callback) {
+      // allow requests with no origin like curl, mobile apps or server-to-server
+      if (!origin) return callback(null, true);
+      const allowed = new Set(
+        [
+          allowedClient,
+          "http://localhost:5173",
+          "http://localhost:3000",
+        ].filter(Boolean)
+      );
+
+      // accept any vercel or onrender subdomain (production)
+      if (origin.endsWith(".vercel.app") || origin.endsWith(".onrender.com")) {
+        return callback(null, true);
+      }
+
+      if (allowed.has(origin)) return callback(null, true);
+      console.warn("Blocked CORS Origin:", origin);
+      return callback(
+        new Error("CORS policy does not allow this origin"),
+        false
+      );
+    },
+    methods: "GET,POST,PUT,DELETE,OPTIONS",
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
@@ -144,4 +173,3 @@ app.get("/", (req, res) => {
 // ✅ Start Server
 const PORT = process.env.PORT || 6005;
 app.listen(PORT, () => console.log(`🚀 Server started on port ${PORT}`));
-

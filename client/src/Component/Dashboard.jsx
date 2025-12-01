@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_URL from "../api/config";
 import { useNavigate } from "react-router-dom";
 import "./dashboard.css";
 import TodoCard from "../TodoCard";
@@ -20,12 +21,7 @@ function Dashboard() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Detect production environment and use appropriate API URL
-  const isProduction = typeof window !== 'undefined' &&
-    window.location.hostname !== 'localhost' &&
-    window.location.hostname !== '127.0.0.1';
-  const API_URL = import.meta.env.VITE_API_URL ||
-    (isProduction ? 'https://todo-1-6mzd.onrender.com' : 'http://localhost:6005');
+  // API_URL is centralized; see src/api/config.js
 
   const navigate = useNavigate();
 

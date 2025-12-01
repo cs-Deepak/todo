@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import API_URL from "../api/config";
 import { toast } from "react-toastify";
 import "./auth.css";
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaCheckCircle } from "react-icons/fa";
@@ -35,25 +36,21 @@ function Signup() {
     }
 
     try {
-      // Detect production environment and use appropriate API URL
-      const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-      const API_URL = import.meta.env.VITE_API_URL ||
-        (isProduction ? 'https://todo-1-6mzd.onrender.com' : 'http://localhost:6005');
-
-      console.log('Environment:', isProduction ? 'Production' : 'Development');
       console.log('Attempting signup to:', `${API_URL}/auth/signup`);
 
-      const res = await axios.post(
-        `${API_URL}/auth/signup`,
-        inputs
-      );
+      const res = await axios.post(`${API_URL}/auth/signup`, inputs);
 
-      if (res.data.message === "User registered successfully") {
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+        const respUser = res.data.user || {};
+        localStorage.setItem("username", respUser.username || inputs.username);
+        localStorage.setItem("userEmail", respUser.email || inputs.email);
+        window.dispatchEvent(new Event("user-changed"));
         setShowSuccess(true);
-        // Auto close after 3 seconds and redirect
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 2000);
+        setTimeout(() => navigate('/dashboard'), 1200);
+      } else if (res.data.success) {
+        setShowSuccess(true);
+        setTimeout(() => navigate('/auth/login'), 1200);
       }
     } catch (err) {
       console.error("Signup error:", err);

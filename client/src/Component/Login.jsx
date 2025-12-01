@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import API_URL from "../api/config";
 import { toast } from "react-toastify";
 import "./auth.css";
 import { FaTasks, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
@@ -28,25 +29,18 @@ function Login() {
     setLoading(true);
 
     try {
-      // Detect production environment and use appropriate API URL
-      const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-      const API_URL = import.meta.env.VITE_API_URL ||
-        (isProduction ? 'https://todo-1-6mzd.onrender.com' : 'http://localhost:6005');
+      console.log('Using API_URL:', API_URL);
 
-      console.log('Environment:', isProduction ? 'Production' : 'Development');
-      console.log('Attempting login to:', `${API_URL}/auth/login`);
-
-      const res = await axios.post(
-        `${API_URL}/auth/login`,
-        inputs
-      );
+      const res = await axios.post(`${API_URL}/auth/login`, inputs);
 
       console.log('Login response:', res.data);
 
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
-        localStorage.setItem("username", res.data.username);
-        localStorage.setItem("userEmail", inputs.email);
+        // prefer server returned user info
+        const respUser = res.data.user || {};
+        localStorage.setItem("username", respUser.username || inputs.email);
+        localStorage.setItem("userEmail", respUser.email || inputs.email);
 
         // Dispatch event to update header
         window.dispatchEvent(new Event("user-changed"));

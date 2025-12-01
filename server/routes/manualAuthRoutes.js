@@ -4,6 +4,29 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../model/user");
 
+// helper route to check token and return user payload
+router.get("/me", async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    if (!authHeader)
+      return res
+        .status(401)
+        .json({ success: false, message: "No token provided" });
+    const token = authHeader.split(" ")[1];
+    if (!token)
+      return res.status(401).json({ success: false, message: "Invalid token" });
+    jwt.verify(token, process.env.JWT_SECRET, (err, payload) => {
+      if (err)
+        return res
+          .status(403)
+          .json({ success: false, message: "Invalid or expired token" });
+      res.json({ success: true, user: payload });
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 // ✅ Signup route
 router.post("/signup", async (req, res) => {
   try {
@@ -19,7 +42,23 @@ router.post("/signup", async (req, res) => {
     const newUser = new User({ username, email, password: hashedPassword });
     await newUser.save();
 
-    res.status(201).json({ success: true, message: "Signup successful!" });
+    // create token and return consistent response like login
+    const token = jwt.sign(
+      { id: newUser._id, email: newUser.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "Signup successful!",
+      token,
+      user: {
+        id: newUser._id,
+        username: newUser.username,
+        email: newUser.email,
+      },
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -29,6 +68,7 @@ router.post("/signup", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log("Login attempt:", email);
 
     const user = await User.findOne({ email });
     if (!user)
@@ -46,10 +86,9 @@ router.post("/login", async (req, res) => {
     const token = jwt.sign(
       { id: user._id, email: user.email },
       process.env.JWT_SECRET,
-      {
-        expiresIn: "1d",
-      }
+      { expiresIn: "1d" }
     );
+    console.log("Login success for:", email, "token created");
 
     res.json({
       success: true,
