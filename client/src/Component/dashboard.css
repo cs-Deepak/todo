@@ -164,6 +164,51 @@ body {
   margin-left: 0.25rem;
 }
 
+/* Dropdown Menu */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.5rem;
+  background: #252945;
+  border: 1px solid #2d3250;
+  border-radius: 8px;
+  padding: 0.5rem;
+  z-index: 100;
+  min-width: 150px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dropdown-menu.right-aligned {
+  left: auto;
+  right: 0;
+}
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #9ca3af;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background: #2d3250;
+  color: #ffffff;
+}
+
+.dropdown-item.active {
+  background: #5b68f4;
+  color: #ffffff;
+}
+
+.filter-btn.active {
+  background: #2d3250;
+  border-color: #5b68f4;
+  color: #ffffff;
+}
+
 /* Kanban Board */
 .kanban-board {
   display: grid;
@@ -398,6 +443,46 @@ body {
   }
 }
 
+/* Mobile: stack kanban columns vertically to avoid overlap */
+@media (max-width: 768px) {
+  .taskflow-dashboard {
+    /* allow content to flow vertically on small screens */
+    height: auto;
+    overflow: visible;
+  }
+
+  .dashboard-top-bar,
+  .page-header,
+  .filters-bar {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .kanban-board {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0 1rem 2rem;
+    overflow: visible;
+  }
+
+  .kanban-column {
+    max-height: none;
+    height: auto;
+  }
+
+  .column-content {
+    /* let column content expand naturally instead of masking with its own scroll */
+    overflow: visible;
+    max-height: none;
+    padding: 0.75rem 1rem 1rem;
+  }
+
+  .add-task-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
 @media (max-width: 1200px) {
   .kanban-board {
     grid-template-columns: 1fr;
@@ -413,6 +498,7 @@ body {
   .taskflow-dashboard {
     flex-direction: column;
   }
+
   /* Hide inline sidebar on mobile; use the hamburger to open overlay sidebar */
   .sidebar {
     display: none;

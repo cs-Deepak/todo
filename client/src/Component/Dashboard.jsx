@@ -13,7 +13,7 @@ import Header from "./Headers";
 import { MdSearch, MdAdd, MdFilterList, MdPerson } from "react-icons/md";
 
 function Dashboard() {
-  const [Inputs, setInputs] = useState({ title: "", body: "", status: "incomplete" });
+  const [Inputs, setInputs] = useState({ title: "", body: "", status: "incomplete", priority: "medium" });
   const [todos, setTodos] = useState([]);
   const [showUpdate, setShowUpdate] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState(null);
@@ -21,9 +21,27 @@ function Dashboard() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // API_URL is centralized; see src/api/config.js
+  // Filter & Sort State
+  const [activeDropdown, setActiveDropdown] = useState(null);
+  const [filterStatus, setFilterStatus] = useState("All");
+  const [filterPriority, setFilterPriority] = useState("All");
+  const [sortBy, setSortBy] = useState("newest"); // newest, oldest, a-z, z-a
 
-  const navigate = useNavigate();
+  // Toggle dropdowns
+  const toggleDropdown = (name) => {
+    setActiveDropdown(activeDropdown === name ? null : name);
+  };
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.filter-btn') && !event.target.closest('.sort-btn')) {
+        setActiveDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // ✅ Fetch Todos (with token)
   const fetchTodos = async () => {
@@ -65,37 +83,6 @@ function Dashboard() {
       document.body.style.overflow = '';
     }
   }, [sidebarOpen]);
-
-  const change = (e) => {
-    const { name, value } = e.target;
-    setInputs({ ...Inputs, [name]: value });
-  };
-
-  const submit = async () => {
-    if (Inputs.title === "" || Inputs.body === "") {
-      toast.error("Title or Body should not be empty");
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("token");
-      const userEmail = localStorage.getItem("userEmail");
-
-      const res = await axios.post(
-        `${API_URL}/api/todos`,
-        { ...Inputs, userEmail },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      setTodos([...todos, res.data]);
-      setInputs({ title: "", body: "", status: "incomplete" });
-      setShowAddModal(false);
-      toast.success("Your Task Is Added");
-    } catch (err) {
-      console.error("Error adding todo", err);
-      toast.error("Failed to add task");
-    }
-  };
 
   const del = async (id) => {
     try {
@@ -162,10 +149,73 @@ function Dashboard() {
     setShowTaskDetails(true);
   };
 
-  // Filter tasks by status - with safety checks
-  const todoTasks = Array.isArray(todos) ? todos.filter((t) => t.status === "incomplete") : [];
-  const inProgressTasks = Array.isArray(todos) ? todos.filter((t) => t.status === "in-progress") : [];
-  const doneTasks = Array.isArray(todos) ? todos.filter((t) => t.status === "complete") : [];
+  const change = (e) => {
+    const { name, value } = e.target;
+    setInputs({ ...Inputs, [name]: value });
+  };
+
+  const submit = async () => {
+    if (Inputs.title === "" || Inputs.body === "") {
+      toast.error("Title or Body should not be empty");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const userEmail = localStorage.getItem("userEmail");
+
+      const res = await axios.post(
+        `${API_URL}/api/todos`,
+        { ...Inputs, userEmail },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setTodos([...todos, res.data]);
+      setInputs({ title: "", body: "", status: "incomplete", priority: "medium" });
+      setShowAddModal(false);
+      toast.success("Your Task Is Added");
+    } catch (err) {
+      console.error("Error adding todo", err);
+      toast.error("Failed to add task");
+    }
+  };
+
+  // ... (existing code) ...
+
+  // Filter and Sort Logic
+  const getFilteredTodos = () => {
+    if (!Array.isArray(todos)) return [];
+
+    let filtered = [...todos];
+
+    // Filter by Priority
+    if (filterPriority !== "All") {
+      filtered = filtered.filter(t => (t.priority || "medium") === filterPriority.toLowerCase());
+    }
+
+    // Sort
+    filtered.sort((a, b) => {
+      if (sortBy === "newest") return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      if (sortBy === "oldest") return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+      if (sortBy === "a-z") return a.title.localeCompare(b.title);
+      if (sortBy === "z-a") return b.title.localeCompare(a.title);
+      return 0;
+    });
+
+    return filtered;
+  };
+
+  const filteredList = getFilteredTodos();
+
+  // Filter tasks by status for columns
+  // If "Status" filter is active, only show that column (or all if "All")
+  const showTodoCol = filterStatus === "All" || filterStatus === "To-Do";
+  const showInProgressCol = filterStatus === "All" || filterStatus === "In Progress";
+  const showDoneCol = filterStatus === "All" || filterStatus === "Done";
+
+  const todoTasks = showTodoCol ? filteredList.filter((t) => t.status === "incomplete") : [];
+  const inProgressTasks = showInProgressCol ? filteredList.filter((t) => t.status === "in-progress") : [];
+  const doneTasks = showDoneCol ? filteredList.filter((t) => t.status === "complete") : [];
 
   return (
     <>
@@ -215,22 +265,75 @@ function Dashboard() {
           {/* Filters */}
           <div className="filters-bar">
             <div className="filter-group">
-              <button className="filter-btn">
-                Status: All <span className="dropdown-arrow">▼</span>
-              </button>
-              <button className="filter-btn">
-                Priority <span className="dropdown-arrow">▼</span>
-              </button>
-              <button className="filter-btn">
-                Labels <span className="dropdown-arrow">▼</span>
-              </button>
-              <button className="filter-btn">
-                Collaborators <span className="dropdown-arrow">▼</span>
-              </button>
+              {/* Status Filter */}
+              <div className="filter-wrapper" style={{ position: 'relative' }}>
+                <button className={`filter-btn ${filterStatus !== 'All' ? 'active' : ''}`} onClick={() => toggleDropdown('status')}>
+                  Status: {filterStatus} <span className="dropdown-arrow">▼</span>
+                </button>
+                {activeDropdown === 'status' && (
+                  <div className="dropdown-menu">
+                    <div className={`dropdown-item ${filterStatus === 'All' ? 'active' : ''}`} onClick={() => { setFilterStatus('All'); setActiveDropdown(null); }}>All</div>
+                    <div className={`dropdown-item ${filterStatus === 'To-Do' ? 'active' : ''}`} onClick={() => { setFilterStatus('To-Do'); setActiveDropdown(null); }}>To-Do</div>
+                    <div className={`dropdown-item ${filterStatus === 'In Progress' ? 'active' : ''}`} onClick={() => { setFilterStatus('In Progress'); setActiveDropdown(null); }}>In Progress</div>
+                    <div className={`dropdown-item ${filterStatus === 'Done' ? 'active' : ''}`} onClick={() => { setFilterStatus('Done'); setActiveDropdown(null); }}>Done</div>
+                  </div>
+                )}
+              </div>
+
+              {/* Priority Filter */}
+              <div className="filter-wrapper" style={{ position: 'relative' }}>
+                <button className={`filter-btn ${filterPriority !== 'All' ? 'active' : ''}`} onClick={() => toggleDropdown('priority')}>
+                  Priority: {filterPriority} <span className="dropdown-arrow">▼</span>
+                </button>
+                {activeDropdown === 'priority' && (
+                  <div className="dropdown-menu">
+                    <div className={`dropdown-item ${filterPriority === 'All' ? 'active' : ''}`} onClick={() => { setFilterPriority('All'); setActiveDropdown(null); }}>All</div>
+                    <div className={`dropdown-item ${filterPriority === 'High' ? 'active' : ''}`} onClick={() => { setFilterPriority('High'); setActiveDropdown(null); }}>High</div>
+                    <div className={`dropdown-item ${filterPriority === 'Medium' ? 'active' : ''}`} onClick={() => { setFilterPriority('Medium'); setActiveDropdown(null); }}>Medium</div>
+                    <div className={`dropdown-item ${filterPriority === 'Low' ? 'active' : ''}`} onClick={() => { setFilterPriority('Low'); setActiveDropdown(null); }}>Low</div>
+                  </div>
+                )}
+              </div>
+
+              {/* Labels Filter (Placeholder) */}
+              <div className="filter-wrapper" style={{ position: 'relative' }}>
+                <button className="filter-btn" onClick={() => toggleDropdown('labels')}>
+                  Labels <span className="dropdown-arrow">▼</span>
+                </button>
+                {activeDropdown === 'labels' && (
+                  <div className="dropdown-menu">
+                    <div className="dropdown-item">No labels available</div>
+                  </div>
+                )}
+              </div>
+
+              {/* Collaborators Filter (Placeholder) */}
+              <div className="filter-wrapper" style={{ position: 'relative' }}>
+                <button className="filter-btn" onClick={() => toggleDropdown('collaborators')}>
+                  Collaborators <span className="dropdown-arrow">▼</span>
+                </button>
+                {activeDropdown === 'collaborators' && (
+                  <div className="dropdown-menu">
+                    <div className="dropdown-item">No collaborators</div>
+                  </div>
+                )}
+              </div>
             </div>
-            <button className="sort-btn">
-              <MdFilterList /> Sort
-            </button>
+
+            {/* Sort Button */}
+            <div className="filter-wrapper" style={{ position: 'relative' }}>
+              <button className="sort-btn" onClick={() => toggleDropdown('sort')}>
+                <MdFilterList /> Sort: {sortBy === 'newest' ? 'Newest' : sortBy === 'oldest' ? 'Oldest' : sortBy === 'a-z' ? 'A-Z' : 'Z-A'}
+              </button>
+              {activeDropdown === 'sort' && (
+                <div className="dropdown-menu right-aligned">
+                  <div className={`dropdown-item ${sortBy === 'newest' ? 'active' : ''}`} onClick={() => { setSortBy('newest'); setActiveDropdown(null); }}>Newest First</div>
+                  <div className={`dropdown-item ${sortBy === 'oldest' ? 'active' : ''}`} onClick={() => { setSortBy('oldest'); setActiveDropdown(null); }}>Oldest First</div>
+                  <div className={`dropdown-item ${sortBy === 'a-z' ? 'active' : ''}`} onClick={() => { setSortBy('a-z'); setActiveDropdown(null); }}>Title (A-Z)</div>
+                  <div className={`dropdown-item ${sortBy === 'z-a' ? 'active' : ''}`} onClick={() => { setSortBy('z-a'); setActiveDropdown(null); }}>Title (Z-A)</div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Kanban Board */}
@@ -253,7 +356,7 @@ function Dashboard() {
                     status={task.status}
                     onStatusChange={updateStatus}
                     onClick={() => handleTaskClick(task)}
-                    priority="medium"
+                    priority={task.priority || "medium"}
                   />
                 ))}
               </div>
@@ -277,7 +380,7 @@ function Dashboard() {
                     status={task.status}
                     onStatusChange={updateStatus}
                     onClick={() => handleTaskClick(task)}
-                    priority="high"
+                    priority={task.priority || "high"}
                   />
                 ))}
               </div>
@@ -301,7 +404,7 @@ function Dashboard() {
                     status={task.status}
                     onStatusChange={updateStatus}
                     onClick={() => handleTaskClick(task)}
-                    priority="low"
+                    priority={task.priority || "low"}
                   />
                 ))}
               </div>
@@ -347,6 +450,24 @@ function Dashboard() {
                 className="modal-textarea"
                 rows="6"
               />
+              <div className="input-group" style={{ marginTop: '1rem' }}>
+                <label style={{ color: '#9ca3af', marginBottom: '0.5rem', display: 'block', fontSize: '0.9rem' }}>Priority</label>
+                <div className="priority-options" style={{ display: 'flex', gap: '1rem' }}>
+                  {['low', 'medium', 'high'].map(p => (
+                    <label key={p} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: '#fff' }}>
+                      <input
+                        type="radio"
+                        name="priority"
+                        value={p}
+                        checked={Inputs.priority === p}
+                        onChange={change}
+                        style={{ accentColor: '#5b68f4' }}
+                      />
+                      {p.charAt(0).toUpperCase() + p.slice(1)}
+                    </label>
+                  ))}
+                </div>
+              </div>
             </div>
             <div className="modal-footer">
               <button className="cancel-btn" onClick={() => setShowAddModal(false)}>
