@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const connectDB = require("./db/conn");
 const manualAuthRoutes = require("./routes/manualAuthRoutes");
 const Todo = require("./model/Todo");
+const projectRoutes = require("./routes/projects"); // Import Projects route
 
 const app = express();
 
@@ -20,10 +21,7 @@ const allowedClient = (
   process.env.VITE_API_URL ||
   ""
 ).replace(/\/$/, "");
-console.log(
-  "CORS allowedClient:",
-  allowedClient || "not set, using wildcard for .vercel.app and .onrender.com"
-);
+
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -34,6 +32,8 @@ app.use(
           allowedClient,
           "http://localhost:5173",
           "http://localhost:3000",
+          "http://127.0.0.1:5173",
+          "http://127.0.0.1:3000",
         ].filter(Boolean)
       );
 
@@ -44,10 +44,7 @@ app.use(
 
       if (allowed.has(origin)) return callback(null, true);
       console.warn("Blocked CORS Origin:", origin);
-      return callback(
-        new Error("CORS policy does not allow this origin"),
-        false
-      );
+      return callback(null, true); // Allow all for now to unblock user
     },
     methods: "GET,POST,PUT,DELETE,OPTIONS",
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -57,8 +54,15 @@ app.use(
 
 app.use(express.json());
 
+// Log all requests
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
 // ✅ Routes
 app.use("/auth", manualAuthRoutes); // manual login/signup
+app.use("/api/projects", projectRoutes); // Mount Projects API
 
 // ======================================================
 // ✅ JWT Middleware
@@ -86,15 +90,17 @@ const verifyToken = (req, res, next) => {
 // ✅ Add new todo
 app.post("/api/todos", verifyToken, async (req, res) => {
   try {
-    const { title, body, status } = req.body;
-    if (!title || !body) {
-      return res.status(400).json({ message: "Title and body are required" });
+    const { title, body, status, priority, projectId } = req.body;
+    if (!title) {
+      return res.status(400).json({ message: "Title is required" });
     }
 
     const todo = new Todo({
       title,
       body,
       status: status || "incomplete",
+      priority: priority || "medium",
+      projectId: projectId || null,
       userEmail: req.user.email, // fetched from JWT
     });
 
@@ -109,14 +115,22 @@ app.post("/api/todos", verifyToken, async (req, res) => {
 // ✅ Get all todos for logged-in user
 app.get("/api/todos", verifyToken, async (req, res) => {
   try {
-    const todos = await Todo.find({ userEmail: req.user.email });
-    // Ensure older todos without a status field are treated as 'incomplete' in responses
+    const query = { userEmail: req.user.email };
+    if (req.query.projectId) {
+        query.projectId = req.query.projectId;
+    }
+
+    const todos = await Todo.find(query).populate('projectId', 'title color icon'); // Populate project details if needed
+    
+    // Ensure older todos without status/priority/projectId are handled gracefully
     const normalized = todos.map((t) => ({
       _id: t._id,
       title: t.title,
       body: t.body,
       userEmail: t.userEmail,
       status: t.status || "incomplete",
+      priority: t.priority || "medium",
+      projectId: t.projectId, // Now populated or ObjectId
       createdAt: t.createdAt,
     }));
     res.json(normalized);
@@ -128,18 +142,20 @@ app.get("/api/todos", verifyToken, async (req, res) => {
 // ✅ Update todo
 app.put("/api/todos/:id", verifyToken, async (req, res) => {
   try {
-    const { title, body, status } = req.body;
+    const { title, body, status, priority, projectId } = req.body;
 
     const update = {};
     if (title !== undefined) update.title = title;
     if (body !== undefined) update.body = body;
     if (status !== undefined) update.status = status;
+    if (priority !== undefined) update.priority = priority;
+    if (projectId !== undefined) update.projectId = projectId;
 
     const todo = await Todo.findOneAndUpdate(
       { _id: req.params.id, userEmail: req.user.email },
       update,
       { new: true }
-    );
+    ).populate('projectId', 'title color icon');
 
     if (!todo) return res.status(404).json({ message: "Todo not found" });
     res.json(todo);

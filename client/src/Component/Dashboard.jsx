@@ -1,49 +1,130 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import API_URL from "../api/config";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./dashboard.css";
-import TodoCard from "../TodoCard";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Updates from "./Updates";
+import "react-toastify/dist/ReactToastify.css";
 import Sidebar from "./Sidebar";
-import TaskDetailsPanel from "./TaskDetailsPanel";
-import Header from "./Headers";
-import { MdSearch, MdAdd, MdFilterList, MdPerson } from "react-icons/md";
+import Header from "./Headers"; // Keep simple header if needed, or remove if integrated
+import {
+  MdSearch,
+  MdFilterList,
+  MdAdd,
+  MdCalendarToday,
+  MdOutlineRadioButtonUnchecked,
+  MdCheckCircle,
+  MdAccessTime,
+} from "react-icons/md";
+import { FaCheck } from "react-icons/fa";
 
-function Dashboard() {
-  const [Inputs, setInputs] = useState({ title: "", body: "", status: "incomplete", priority: "medium" });
-  const [todos, setTodos] = useState([]);
-  const [showUpdate, setShowUpdate] = useState(false);
-  const [selectedTodo, setSelectedTodo] = useState(null);
-  const [showTaskDetails, setShowTaskDetails] = useState(false);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+const TaskItem = ({ task, onStatusChange, onEdit, onDelete }) => {
+  const isCompleted = task.status === "complete";
 
-  // Filter & Sort State
-  const [activeDropdown, setActiveDropdown] = useState(null);
-  const [filterStatus, setFilterStatus] = useState("All");
-  const [filterPriority, setFilterPriority] = useState("All");
-  const [sortBy, setSortBy] = useState("newest"); // newest, oldest, a-z, z-a
-
-  // Toggle dropdowns
-  const toggleDropdown = (name) => {
-    setActiveDropdown(activeDropdown === name ? null : name);
+  const handleCheck = (e) => {
+    e.stopPropagation();
+    onStatusChange(task._id, isCompleted ? "incomplete" : "complete");
   };
 
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest('.filter-btn') && !event.target.closest('.sort-btn')) {
-        setActiveDropdown(null);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const getPriorityClass = (p) => {
+    if (!p) return "priority-medium";
+    return `priority-${p.toLowerCase()}`;
+  };
 
-  // ✅ Fetch Todos (with token)
+  return (
+    <div
+      className={`task-row ${isCompleted ? "completed" : ""}`}
+      onClick={() => onEdit(task)}
+    >
+      <div className="task-checkbox-wrapper" onClick={handleCheck}>
+        {isCompleted ? (
+          <div className="custom-checkbox checked">
+            <FaCheck size={10} />
+          </div>
+        ) : (
+          <div className="custom-checkbox"></div>
+        )}
+      </div>
+
+      <div className="task-content">
+        <div className="task-title-row">
+          <span className={`task-title ${isCompleted ? "strikethrough" : ""}`}>
+            {task.title}
+          </span>
+        </div>
+
+        <div className="task-meta-row">
+          {!isCompleted && (
+            <span className={`priority-tag ${getPriorityClass(task.priority)}`}>
+              ! {task.priority ? task.priority.toUpperCase() : "MEDIUM"}
+            </span>
+          )}
+          <div className="meta-date">
+            {isCompleted ? (
+              <span>Completed Today • 10:30 AM</span>
+            ) : (
+              <>
+                <MdAccessTime className="meta-icon-small" />
+                <span>Today • 2:00 PM</span>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+function Dashboard() {
+  const navigate = useNavigate();
+  const location = useLocation(); // Hook to access state passed from Projects
+
+  // Data State
+  const [todos, setTodos] = useState([]);
+  const [projects, setProjects] = useState([]); // Store fetched projects
+  const [filterProject, setFilterProject] = useState(
+    location.state?.projectId || null
+  ); // Project Filter
+
+  // Form State
+  const [Inputs, setInputs] = useState({
+    title: "",
+    body: "",
+    status: "incomplete",
+    priority: "medium",
+    projectId: "", // Add projectId to form
+  });
+
+  // UI State
+  // UI State
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("my_tasks"); // Sidebar tab
+  const [filterTab, setFilterTab] = useState("all"); // 'all', 'active', 'completed'
+
+  const username = localStorage.getItem("username") || "Alex";
+  const currentDate = new Date().toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  // Fetch Projects for Dropdown
+  const fetchProjects = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      const res = await axios.get(`${API_URL}/api/projects`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProjects(res.data);
+    } catch (err) {
+      console.error("Failed to fetch projects");
+    }
+  };
+
+  // Fetch Todos with Filter
   const fetchTodos = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -53,15 +134,16 @@ function Dashboard() {
         return;
       }
 
+      const params = {};
+      if (filterProject) params.projectId = filterProject; // Add filter param
+
       const res = await axios.get(`${API_URL}/api/todos`, {
         headers: { Authorization: `Bearer ${token}` },
+        params: params, // Send params
       });
-      // Ensure todos is always an array
       setTodos(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      console.error("Error fetching todos", err);
       if (err.response?.status === 401) {
-        toast.error("Session expired, please login again.");
         localStorage.removeItem("token");
         navigate("/auth/login");
       }
@@ -69,36 +151,24 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    fetchTodos();
-    const toggleHandler = () => setSidebarOpen(s => !s);
-    window.addEventListener('sidebar-toggle', toggleHandler);
-    return () => window.removeEventListener('sidebar-toggle', toggleHandler);
+    fetchProjects();
   }, []);
 
   useEffect(() => {
-    // prevent body scroll when sidebar overlay is open on mobile
-    if (sidebarOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
+    // Re-fetch todos when filterProject changes
+    fetchTodos();
+  }, [filterProject]);
+
+  // Update filter if location state changes (e.g. navigating from Projects)
+  useEffect(() => {
+    if (location.state?.projectId) {
+      setFilterProject(location.state.projectId);
+      // Clear location state to prevent stuck filter on refresh if handled by history?
+      // Actually good to keep unless user explicitly clears.
     }
-  }, [sidebarOpen]);
+  }, [location.state]);
 
-  const del = async (id) => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`${API_URL}/api/todos/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      setTodos(Array.isArray(todos) ? todos.filter((todo) => todo._id !== id) : []);
-      toast.info("Task deleted");
-    } catch (err) {
-      console.error("Error deleting todo", err);
-      toast.error("Failed to delete task");
-    }
-  };
-
+  // Actions
   const updateStatus = async (id, newStatus) => {
     try {
       const token = localStorage.getItem("token");
@@ -107,46 +177,43 @@ function Dashboard() {
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      const updatedTodos = Array.isArray(todos) ? todos.map((t) => (t._id === id ? res.data : t)) : [];
-      setTodos(updatedTodos);
-      toast.success("Task status updated");
+      setTodos(todos.map((t) => (t._id === id ? res.data : t)));
+      toast.success(
+        newStatus === "complete" ? "Task Completed!" : "Task Reactivated!"
+      );
     } catch (err) {
-      console.error("Error updating status", err);
       toast.error("Failed to update status");
     }
   };
 
-  const handleEdit = (item) => {
-    setSelectedTodo(item);
-    setShowUpdate(true);
-  };
-
-  const handleUpdate = async (updatedItem) => {
+  const submit = async () => {
+    if (!Inputs.title) return toast.error("Title is required");
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.put(
-        `${API_URL}/api/todos/${selectedTodo._id}`,
-        updatedItem,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const userEmail = localStorage.getItem("userEmail");
 
-      const updatedTodos = Array.isArray(todos)
-        ? todos.map((todo) => (todo._id === selectedTodo._id ? res.data : todo))
-        : [];
-      setTodos(updatedTodos);
-      setShowUpdate(false);
-      setShowTaskDetails(false);
-      toast.success("Task Updated Successfully");
+      // If we are in a project view, auto-assign that project?
+      const payload = { ...Inputs, userEmail };
+      if (filterProject && !payload.projectId) {
+        payload.projectId = filterProject;
+      }
+
+      const res = await axios.post(`${API_URL}/api/todos`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTodos([...todos, res.data]);
+      setInputs({
+        title: "",
+        body: "",
+        status: "incomplete",
+        priority: "medium",
+        projectId: "",
+      });
+      setShowAddModal(false);
+      toast.success("Task Added");
     } catch (err) {
-      console.error("Error updating todo", err);
-      toast.error("Failed to update task");
+      toast.error("Failed to add task");
     }
-  };
-
-  const handleTaskClick = (task) => {
-    setSelectedTodo(task);
-    setShowTaskDetails(true);
   };
 
   const change = (e) => {
@@ -154,273 +221,155 @@ function Dashboard() {
     setInputs({ ...Inputs, [name]: value });
   };
 
-  const submit = async () => {
-    if (Inputs.title === "" || Inputs.body === "") {
-      toast.error("Title or Body should not be empty");
-      return;
-    }
+  // derived state
+  const activeTasks = todos.filter((t) => t.status !== "complete");
+  const completedTasks = todos.filter((t) => t.status === "complete");
 
-    try {
-      const token = localStorage.getItem("token");
-      const userEmail = localStorage.getItem("userEmail");
-
-      const res = await axios.post(
-        `${API_URL}/api/todos`,
-        { ...Inputs, userEmail },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      setTodos([...todos, res.data]);
-      setInputs({ title: "", body: "", status: "incomplete", priority: "medium" });
-      setShowAddModal(false);
-      toast.success("Your Task Is Added");
-    } catch (err) {
-      console.error("Error adding todo", err);
-      toast.error("Failed to add task");
-    }
-  };
-
-  // ... (existing code) ...
-
-  // Filter and Sort Logic
-  const getFilteredTodos = () => {
-    if (!Array.isArray(todos)) return [];
-
-    let filtered = [...todos];
-
-    // Filter by Priority
-    if (filterPriority !== "All") {
-      filtered = filtered.filter(t => (t.priority || "medium") === filterPriority.toLowerCase());
-    }
-
-    // Sort
-    filtered.sort((a, b) => {
-      if (sortBy === "newest") return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-      if (sortBy === "oldest") return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
-      if (sortBy === "a-z") return a.title.localeCompare(b.title);
-      if (sortBy === "z-a") return b.title.localeCompare(a.title);
-      return 0;
-    });
-
-    return filtered;
-  };
-
-  const filteredList = getFilteredTodos();
-
-  // Filter tasks by status for columns
-  // If "Status" filter is active, only show that column (or all if "All")
-  const showTodoCol = filterStatus === "All" || filterStatus === "To-Do";
-  const showInProgressCol = filterStatus === "All" || filterStatus === "In Progress";
-  const showDoneCol = filterStatus === "All" || filterStatus === "Done";
-
-  const todoTasks = showTodoCol ? filteredList.filter((t) => t.status === "incomplete") : [];
-  const inProgressTasks = showInProgressCol ? filteredList.filter((t) => t.status === "in-progress") : [];
-  const doneTasks = showDoneCol ? filteredList.filter((t) => t.status === "complete") : [];
+  // Get current project name if filtering
+  const currentProject = projects.find((p) => p._id === filterProject);
 
   return (
-    <>
-      <ToastContainer
-        position="top-right"
-        theme="dark"
-        toastStyle={{
-          background: "#5b68f4",
-          color: "white",
-          borderRadius: "12px",
-        }}
-      />
+    <div className="taskflow-dashboard">
+      <ToastContainer position="top-right" theme="dark" />
 
+      {/* Sidebar Overlay for Mobile */}
+      <div className={`sidebar-container ${sidebarOpen ? "open" : ""}`}>
+        <Sidebar
+          activeTab={activeTab}
+          onSelect={setActiveTab}
+          onClose={() => setSidebarOpen(false)}
+        />
+        <div
+          className="sidebar-overlay"
+          onClick={() => setSidebarOpen(false)}
+        ></div>
+      </div>
 
-      <div className="taskflow-dashboard">
-        {/* Left Sidebar */}
-        <div className={`sidebar-container ${sidebarOpen ? 'open' : ''}`}>
-          <Sidebar activeTab="today" />
-          <button className="sidebar-overlay" onClick={() => setSidebarOpen(false)}></button>
-        </div>
-
-        {/* Main Content */}
-        <div className="main-content">
-          {/* Search and Add Task Bar */}
-          <div className="dashboard-top-bar">
-            <div className="search-container">
-              <MdSearch className="search-icon" />
-              <input
-                type="text"
-                placeholder="Search tasks, projects, etc..."
-                className="search-input"
-              />
+      <div className="main-content">
+        <div className="content-padding">
+          {/* Header Section */}
+          <div className="dashboard-header-section">
+            <div className="header-titles">
+              <h1 className="main-title">
+                {currentProject
+                  ? `Project: ${currentProject.title}`
+                  : "My Tasks"}
+              </h1>
+              <div className="sub-header-info">
+                {currentProject && (
+                  <button
+                    className="filter-btn-outline"
+                    style={{
+                      marginLeft: 0,
+                      marginRight: "1rem",
+                      fontSize: "0.8rem",
+                      padding: "0.2rem 0.6rem",
+                    }}
+                    onClick={() => {
+                      setFilterProject(null);
+                      navigate("/dashboard", { state: {} }); // Clear state
+                    }}
+                  >
+                    Clear Filter ✕
+                  </button>
+                )}
+                <span className="weather-icon">☀</span>
+                <span>
+                  Good Morning, {username} • {currentDate}
+                </span>
+              </div>
             </div>
-            <button className="add-task-btn" onClick={() => setShowAddModal(true)}>
-              <MdAdd /> Add Task
-            </button>
           </div>
 
-          {/* Page Header */}
-          <div className="page-header">
-            <div>
-              <h1 className="page-title">Today</h1>
-              <p className="page-subtitle">Here's a look at what's on your plate for today.</p>
-            </div>
-          </div>
-
-          {/* Filters */}
-          <div className="filters-bar">
-            <div className="filter-group">
-              {/* Status Filter */}
-              <div className="filter-wrapper" style={{ position: 'relative' }}>
-                <button className={`filter-btn ${filterStatus !== 'All' ? 'active' : ''}`} onClick={() => toggleDropdown('status')}>
-                  Status: {filterStatus} <span className="dropdown-arrow">▼</span>
-                </button>
-                {activeDropdown === 'status' && (
-                  <div className="dropdown-menu">
-                    <div className={`dropdown-item ${filterStatus === 'All' ? 'active' : ''}`} onClick={() => { setFilterStatus('All'); setActiveDropdown(null); }}>All</div>
-                    <div className={`dropdown-item ${filterStatus === 'To-Do' ? 'active' : ''}`} onClick={() => { setFilterStatus('To-Do'); setActiveDropdown(null); }}>To-Do</div>
-                    <div className={`dropdown-item ${filterStatus === 'In Progress' ? 'active' : ''}`} onClick={() => { setFilterStatus('In Progress'); setActiveDropdown(null); }}>In Progress</div>
-                    <div className={`dropdown-item ${filterStatus === 'Done' ? 'active' : ''}`} onClick={() => { setFilterStatus('Done'); setActiveDropdown(null); }}>Done</div>
-                  </div>
-                )}
-              </div>
-
-              {/* Priority Filter */}
-              <div className="filter-wrapper" style={{ position: 'relative' }}>
-                <button className={`filter-btn ${filterPriority !== 'All' ? 'active' : ''}`} onClick={() => toggleDropdown('priority')}>
-                  Priority: {filterPriority} <span className="dropdown-arrow">▼</span>
-                </button>
-                {activeDropdown === 'priority' && (
-                  <div className="dropdown-menu">
-                    <div className={`dropdown-item ${filterPriority === 'All' ? 'active' : ''}`} onClick={() => { setFilterPriority('All'); setActiveDropdown(null); }}>All</div>
-                    <div className={`dropdown-item ${filterPriority === 'High' ? 'active' : ''}`} onClick={() => { setFilterPriority('High'); setActiveDropdown(null); }}>High</div>
-                    <div className={`dropdown-item ${filterPriority === 'Medium' ? 'active' : ''}`} onClick={() => { setFilterPriority('Medium'); setActiveDropdown(null); }}>Medium</div>
-                    <div className={`dropdown-item ${filterPriority === 'Low' ? 'active' : ''}`} onClick={() => { setFilterPriority('Low'); setActiveDropdown(null); }}>Low</div>
-                  </div>
-                )}
-              </div>
-
-              {/* Labels Filter (Placeholder) */}
-              <div className="filter-wrapper" style={{ position: 'relative' }}>
-                <button className="filter-btn" onClick={() => toggleDropdown('labels')}>
-                  Labels <span className="dropdown-arrow">▼</span>
-                </button>
-                {activeDropdown === 'labels' && (
-                  <div className="dropdown-menu">
-                    <div className="dropdown-item">No labels available</div>
-                  </div>
-                )}
-              </div>
-
-              {/* Collaborators Filter (Placeholder) */}
-              <div className="filter-wrapper" style={{ position: 'relative' }}>
-                <button className="filter-btn" onClick={() => toggleDropdown('collaborators')}>
-                  Collaborators <span className="dropdown-arrow">▼</span>
-                </button>
-                {activeDropdown === 'collaborators' && (
-                  <div className="dropdown-menu">
-                    <div className="dropdown-item">No collaborators</div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Sort Button */}
-            <div className="filter-wrapper" style={{ position: 'relative' }}>
-              <button className="sort-btn" onClick={() => toggleDropdown('sort')}>
-                <MdFilterList /> Sort: {sortBy === 'newest' ? 'Newest' : sortBy === 'oldest' ? 'Oldest' : sortBy === 'a-z' ? 'A-Z' : 'Z-A'}
+          {/* Filter Tabs & Search */}
+          <div className="controls-row">
+            <div className="filter-tabs">
+              <button
+                className={`tab-btn ${filterTab === "all" ? "active" : ""}`}
+                onClick={() => setFilterTab("all")}
+              >
+                All
               </button>
-              {activeDropdown === 'sort' && (
-                <div className="dropdown-menu right-aligned">
-                  <div className={`dropdown-item ${sortBy === 'newest' ? 'active' : ''}`} onClick={() => { setSortBy('newest'); setActiveDropdown(null); }}>Newest First</div>
-                  <div className={`dropdown-item ${sortBy === 'oldest' ? 'active' : ''}`} onClick={() => { setSortBy('oldest'); setActiveDropdown(null); }}>Oldest First</div>
-                  <div className={`dropdown-item ${sortBy === 'a-z' ? 'active' : ''}`} onClick={() => { setSortBy('a-z'); setActiveDropdown(null); }}>Title (A-Z)</div>
-                  <div className={`dropdown-item ${sortBy === 'z-a' ? 'active' : ''}`} onClick={() => { setSortBy('z-a'); setActiveDropdown(null); }}>Title (Z-A)</div>
-                </div>
-              )}
+              <button
+                className={`tab-btn ${filterTab === "active" ? "active" : ""}`}
+                onClick={() => setFilterTab("active")}
+              >
+                Active
+              </button>
+              <button
+                className={`tab-btn ${
+                  filterTab === "completed" ? "active" : ""
+                }`}
+                onClick={() => setFilterTab("completed")}
+              >
+                Completed
+              </button>
+            </div>
+
+            <div className="search-filter-wrapper">
+              <div className="search-bar">
+                <MdSearch className="search-icon-small" />
+                <input type="text" placeholder="Search tasks..." />
+              </div>
+              <button className="filter-icon-btn">
+                <MdFilterList />
+              </button>
             </div>
           </div>
 
-          {/* Kanban Board */}
-          <div className="kanban-board">
-            {/* To-Do Column */}
-            <div className="kanban-column">
-              <div className="column-header">
-                <h3 className="column-title">To-Do</h3>
-                <span className="column-count">{todoTasks.length}</span>
+          {/* Task Lists */}
+          <div className="task-lists-container">
+            {/* Active Tasks Section */}
+            {(filterTab === "all" || filterTab === "active") && (
+              <div className="list-section">
+                <h3 className="section-title">TODAY</h3>
+                <div className="list-tasks">
+                  {activeTasks.length > 0 ? (
+                    activeTasks.map((task) => (
+                      <TaskItem
+                        key={task._id}
+                        task={task}
+                        onStatusChange={updateStatus}
+                        onEdit={(t) => navigate(`/task/${t._id}`)}
+                      />
+                    ))
+                  ) : (
+                    <p className="empty-state-text">No active tasks found.</p>
+                  )}
+                </div>
               </div>
-              <div className="column-content">
-                {todoTasks.map((task) => (
-                  <TodoCard
-                    key={task._id}
-                    title={task.title}
-                    body={task.body}
-                    id={task._id}
-                    delid={del}
-                    onEdit={() => handleEdit(task)}
-                    status={task.status}
-                    onStatusChange={updateStatus}
-                    onClick={() => handleTaskClick(task)}
-                    priority={task.priority || "medium"}
-                  />
-                ))}
-              </div>
-            </div>
+            )}
 
-            {/* In Progress Column */}
-            <div className="kanban-column">
-              <div className="column-header">
-                <h3 className="column-title">In Progress</h3>
-                <span className="column-count">{inProgressTasks.length}</span>
+            {/* Completed Tasks Section */}
+            {(filterTab === "all" || filterTab === "completed") && (
+              <div className="list-section">
+                <h3 className="section-title">COMPLETED</h3>
+                <div className="list-tasks">
+                  {completedTasks.length > 0 ? (
+                    completedTasks.map((task) => (
+                      <TaskItem
+                        key={task._id}
+                        task={task}
+                        onStatusChange={updateStatus}
+                        onEdit={(t) => navigate(`/task/${t._id}`)}
+                      />
+                    ))
+                  ) : (
+                    <p className="empty-state-text">No completed tasks yet.</p>
+                  )}
+                </div>
               </div>
-              <div className="column-content">
-                {inProgressTasks.map((task) => (
-                  <TodoCard
-                    key={task._id}
-                    title={task.title}
-                    body={task.body}
-                    id={task._id}
-                    delid={del}
-                    onEdit={() => handleEdit(task)}
-                    status={task.status}
-                    onStatusChange={updateStatus}
-                    onClick={() => handleTaskClick(task)}
-                    priority={task.priority || "high"}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Done Column */}
-            <div className="kanban-column">
-              <div className="column-header">
-                <h3 className="column-title">Done</h3>
-                <span className="column-count">{doneTasks.length}</span>
-              </div>
-              <div className="column-content">
-                {doneTasks.map((task) => (
-                  <TodoCard
-                    key={task._id}
-                    title={task.title}
-                    body={task.body}
-                    id={task._id}
-                    delid={del}
-                    onEdit={() => handleEdit(task)}
-                    status={task.status}
-                    onStatusChange={updateStatus}
-                    onClick={() => handleTaskClick(task)}
-                    priority={task.priority || "low"}
-                  />
-                ))}
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Right Sidebar - Task Details */}
-        {showTaskDetails && selectedTodo && (
-          <TaskDetailsPanel
-            task={selectedTodo}
-            onClose={() => setShowTaskDetails(false)}
-            onUpdate={handleUpdate}
-            onDelete={del}
-          />
-        )}
+        {/* Floating Add Button */}
+        <button
+          className="floating-add-btn"
+          onClick={() => setShowAddModal(true)}
+        >
+          <MdAdd size={24} /> <span>Add Task</span>
+        </button>
       </div>
 
       {/* Add Task Modal */}
@@ -428,74 +377,120 @@ function Dashboard() {
         <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
           <div className="add-task-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Add New Task</h2>
-              <button className="close-modal-btn" onClick={() => setShowAddModal(false)}>
+              <h2>Create New Task</h2>
+              <button
+                className="close-modal-btn"
+                onClick={() => setShowAddModal(false)}
+              >
                 ×
               </button>
             </div>
             <div className="modal-body">
+              {/* Main Title Input */}
               <input
                 type="text"
-                placeholder="Task title..."
+                placeholder="What needs to be done?"
                 onChange={change}
                 name="title"
                 value={Inputs.title}
-                className="modal-input"
+                className="large-title-input"
               />
-              <textarea
-                name="body"
-                placeholder="Task description..."
-                onChange={change}
-                value={Inputs.body}
-                className="modal-textarea"
-                rows="6"
-              />
-              <div className="input-group" style={{ marginTop: '1rem' }}>
-                <label style={{ color: '#9ca3af', marginBottom: '0.5rem', display: 'block', fontSize: '0.9rem' }}>Priority</label>
-                <div className="priority-options" style={{ display: 'flex', gap: '1rem' }}>
-                  {['low', 'medium', 'high'].map(p => (
-                    <label key={p} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: '#fff' }}>
-                      <input
-                        type="radio"
-                        name="priority"
-                        value={p}
-                        checked={Inputs.priority === p}
-                        onChange={change}
-                        style={{ accentColor: '#5b68f4' }}
-                      />
-                      {p.charAt(0).toUpperCase() + p.slice(1)}
+
+              {/* Description */}
+              <div className="input-group full-width">
+                <label>
+                  Description <span className="optional-text">(Optional)</span>
+                </label>
+                <textarea
+                  name="body"
+                  placeholder="Add details regarding this task..."
+                  onChange={change}
+                  value={Inputs.body}
+                  className="modal-textarea"
+                  rows="4"
+                />
+              </div>
+
+              {/* Details Grid */}
+              <div className="modal-grid">
+                {/* Due Date */}
+                <div className="grid-item">
+                  <label>Due Date</label>
+                  <div className="date-input-wrapper">
+                    <MdCalendarToday className="input-icon" />
+                    <input type="date" className="styled-input" />
+                  </div>
+                </div>
+
+                {/* Priority */}
+                <div className="grid-item">
+                  <label>Priority</label>
+                  <div className="priority-segment">
+                    {["low", "medium", "high"].map((p) => (
+                      <button
+                        key={p}
+                        className={`segment-btn ${
+                          Inputs.priority === p ? "active" : ""
+                        }`}
+                        onClick={() => setInputs({ ...Inputs, priority: p })}
+                      >
+                        {p.charAt(0).toUpperCase() + p.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Project (Dynamic) */}
+                <div className="grid-item">
+                  <label>Project</label>
+                  <select
+                    className="styled-input"
+                    name="projectId"
+                    onChange={change}
+                    value={
+                      Inputs.projectId || (filterProject ? filterProject : "")
+                    }
+                  >
+                    <option value="">No Project</option>
+                    {projects.map((proj) => (
+                      <option key={proj._id} value={proj._id}>
+                        {proj.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Settings (Reminder) */}
+                <div className="grid-item">
+                  <label>Settings</label>
+                  <div className="reminder-toggle-wrapper">
+                    <div className="reminder-label">
+                      <MdAccessTime /> Set Reminder
+                    </div>
+                    <label className="switch">
+                      <input type="checkbox" />
+                      <span className="slider round"></span>
                     </label>
-                  ))}
+                  </div>
                 </div>
               </div>
             </div>
             <div className="modal-footer">
-              <button className="cancel-btn" onClick={() => setShowAddModal(false)}>
+              <button
+                className="cancel-btn"
+                onClick={() => setShowAddModal(false)}
+              >
                 Cancel
               </button>
-              <button className="submit-btn" onClick={submit}>
-                Add Task
+              <button className="submit-btn save-task-btn" onClick={submit}>
+                <MdAdd /> Save Task
               </button>
             </div>
           </div>
         </div>
       )}
-
-      {/* Update Modal */}
-      {showUpdate && selectedTodo && (
-        <div className="modal-overlay" id="todo-update">
-          <div className="modal-container">
-            <Updates
-              todo={selectedTodo}
-              onUpdate={handleUpdate}
-              onClose={() => setShowUpdate(false)}
-            />
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   );
 }
 
 export default Dashboard;
-

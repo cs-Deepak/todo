@@ -16,6 +16,16 @@ const todoSchema = new mongoose.Schema({
     enum: ["incomplete", "in-progress", "complete"],
     default: "incomplete",
   },
+  priority: {
+    type: String,
+    enum: ["low", "medium", "high"],
+    default: "medium",
+  },
+  projectId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Project",
+    default: null,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

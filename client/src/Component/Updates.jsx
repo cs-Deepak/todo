@@ -1,118 +1,102 @@
-// import React, { useState } from 'react';
-// import './updates.css';
+import React, { useState } from "react";
+// import './Updates.css'; // Using dashboard.css classes for consistency
+import "./dashboard.css";
 
-// const Updates = ({ todo, onUpdate, onClose }) => {
-//   const [title, setTitle] = useState(todo.title);
-//   const [body, setBody] = useState(todo.body);
-
-//   const handleSubmit = () => {
-//     if (title.trim() === '' || body.trim() === '') {
-//       alert('Title or Body cannot be empty');
-//       return;
-//     }
-//     onUpdate({ title, body });
-//   };
-
-//   return (
-//     <div className="update-container">
-//       <h3>Update Your Task</h3>
-//       <input
-//         type="text"
-//         className="todo-inputs"
-//         value={title}
-//         onChange={(e) => setTitle(e.target.value)}
-//         placeholder="Edit title"
-//       />
-//       <textarea
-//         className="todo-text"
-//         value={body}
-//         onChange={(e) => setBody(e.target.value)}
-//         placeholder="Edit body"
-//       ></textarea>
-
-//       <div className='btn-update'>
-//       <button className="update-btn" onClick={handleSubmit}>
-//         Update
-//       </button>
-//       <button className="update-btn" onClick={onClose} style={{ marginLeft: '10px' }}>
-//         Cancel
-//       </button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Updates;
-
-
-
-import React, { useState } from 'react';
-import './Updates.css';
-
-const Updates = ({ todo, onUpdate, onClose }) => {
+const Updates = ({ todo, onUpdate, onClose, onDelete }) => {
   const [title, setTitle] = useState(todo.title);
   const [body, setBody] = useState(todo.body);
+  const [priority, setPriority] = useState(todo.priority || "medium");
 
   const handleSubmit = () => {
-    if (title.trim() === '' || body.trim() === '') {
-      alert('Title or Body cannot be empty');
+    if (title.trim() === "" || body.trim() === "") {
+      // You might want to use a toast here if available, but for now generic alert or nothing
       return;
     }
-    onUpdate({ title, body });
+    onUpdate({ title, body, priority });
+  };
+
+  const handleDelete = () => {
+    if (window.confirm("Are you sure you want to delete this task?")) {
+      onDelete(todo._id);
+    }
   };
 
   return (
-    <div className="update-overlay">
-      <div className="update-container">
-        <div className="update-header">
-          <h3 className="update-title">Update Your Task</h3>
-          <button className="close-btn" onClick={onClose}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
+    <div className="add-task-modal" style={{ width: "100%", border: "none" }}>
+      {/* Reusing add-task-modal class for styling consistency. 
+        Inline style overrides width/border because this component is rendered INSIDE a wrapper in Dashboard */}
+
+      <div className="modal-header">
+        <h2>Update Task</h2>
+        <button className="close-modal-btn" onClick={onClose}>
+          ×
+        </button>
+      </div>
+
+      <div className="modal-body">
+        <input
+          type="text"
+          className="modal-input"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Task title..."
+        />
+
+        <textarea
+          className="modal-textarea"
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          placeholder="Task description..."
+          rows="5"
+        ></textarea>
+
+        <div className="input-group">
+          <label
+            className="priority-label"
+            style={{
+              color: "#8b949e",
+              marginBottom: "0.5rem",
+              display: "block",
+              fontSize: "0.9rem",
+            }}
+          >
+            Priority
+          </label>
+          <div
+            className="priority-select-row"
+            style={{ display: "flex", gap: "0.75rem" }}
+          >
+            {["low", "medium", "high"].map((p) => (
+              <button
+                key={p}
+                className={`priority-select-btn ${
+                  priority === p ? "selected " + p : ""
+                }`}
+                onClick={() => setPriority(p)}
+              >
+                {p.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="modal-footer" style={{ justifyContent: "space-between" }}>
+        <button
+          className="cancel-btn"
+          style={{ borderColor: "#ff7b72", color: "#ff7b72" }}
+          onClick={handleDelete}
+        >
+          Delete
+        </button>
+        <div style={{ display: "flex", gap: "0.75rem" }}>
+          <button className="cancel-btn" onClick={onClose}>
+            Cancel
+          </button>
+          <button className="submit-btn" onClick={handleSubmit}>
+            Update
           </button>
         </div>
-        
-        <div className="update-content">
-          <div className="input-group">
-            <label className="input-label">Task Title</label>
-            <input
-              type="text"
-              className="todo-inputs"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter task title..."
-            />
-          </div>
-          
-          <div className="input-group">
-            <label className="input-label">Description</label>
-            <textarea
-              className="todo-text"
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              placeholder="Describe your task in detail..."
-              rows="4"
-            ></textarea>
-          </div>
-          
-          <div className="btn-update">
-            <button className="update-btn primary" onClick={handleSubmit}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                <polyline points="17,21 17,13 7,13 7,21"></polyline>
-                <polyline points="7,3 7,8 15,8"></polyline>
-              </svg>
-              Update Task
-            </button>
-            <button className="update-btn secondary" onClick={onClose}>
-              Cancel
-            </button>
-          </div>
-        </div>
-        
-        <div className="update-accent"></div>
       </div>
     </div>
   );

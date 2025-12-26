@@ -1,9 +1,8 @@
-body{
+body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-* {
-  
-  background: linear-gradient(to bottom, pink, blue);
+  background-color: #0d1117; /* Dark background matching the theme */
+  color: #c9d1d9; /* Light text for readability */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }

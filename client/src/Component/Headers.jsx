@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./header.css";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import { FaTasks } from "react-icons/fa";
+import { FaTasks, FaBell, FaPlus } from "react-icons/fa";
 
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -15,7 +15,7 @@ const Header = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
-    const name = localStorage.getItem("username") || "";
+    const name = localStorage.getItem("username") || "Rohan"; // Default to Rohan as per design if not found
     const email = localStorage.getItem("userEmail") || "";
     setUsername(name);
     setUserEmail(email);
@@ -25,7 +25,7 @@ const Header = () => {
     const refresh = () => {
       const token = localStorage.getItem("token");
       setIsLoggedIn(!!token);
-      const name = localStorage.getItem("username") || "";
+      const name = localStorage.getItem("username") || "Rohan";
       const email = localStorage.getItem("userEmail") || "";
       setUsername(name);
       setUserEmail(email);
@@ -54,85 +54,82 @@ const Header = () => {
     return () => document.removeEventListener("click", onDocClick);
   }, []);
 
-  // dispatch a toggle event for mobile sidebar
-  const toggleMobileSidebar = () => {
-    try {
-      window.dispatchEvent(new CustomEvent('sidebar-toggle'));
-    } catch (err) {
-      // fallback for older browsers
-      const event = document.createEvent('Event');
-      event.initEvent('sidebar-toggle', true, true);
-      window.dispatchEvent(event);
-    }
-  };
-
   return (
     <header className="taskflow-header">
       <nav className="header-container">
         {/* Brand */}
-        <div className="header-brand">
-          <FaTasks className="brand-logo" />
-          <span className="brand-name">TaskFlow</span>
+        <div className="header-brand" onClick={() => navigate("/")}>
+          <div className="brand-logo-container">
+           
+          </div>
+          <span className="brand-name">TaskMaster</span>
         </div>
 
-        {/* Navigation Links */}
-        <div className="header-nav">
-          <NavLink to="/" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>Home</NavLink>
-          <NavLink to="/dashboard" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>Dashboard</NavLink>
+        {/* Center Navigation Pills */}
+        <div className="header-center-nav">
+          <div className="nav-pills">
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `nav-pill ${isActive ? "active" : ""}`
+              }
+            >
+              Home
+            </NavLink>
+            <NavLink
+              to="/dashboard"
+              className={({ isActive }) =>
+                `nav-pill ${isActive ? "active" : ""}`
+              }
+            >
+              Dashboard
+            </NavLink>
+          </div>
         </div>
 
-        {/* Mobile hamburger (visible on small screens) */}
-        <button
-          className="hamburger"
-          aria-label="Open menu"
-          onClick={() => toggleMobileSidebar()}
-        >
-          <span className="hamburger-line"></span>
-          <span className="hamburger-line"></span>
-          <span className="hamburger-line"></span>
-        </button>
-
-        {/* Auth Section */}
+        {/* Right Actions */}
         <div className="header-actions">
-          {isLoggedIn ? (
-            <div className="user-welcome">
-              <div className="user-avatar-small">
-                {username ? username.charAt(0).toUpperCase() : "U"}
-              </div>
-              <span className="welcome-text">Welcome, {username || "User"}</span>
-              <div className="user-menu" ref={profileRef}>
-                <button
-                  className="menu-toggle"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowProfile((s) => !s);
-                  }}
-                >
-                  ▼
-                </button>
 
-                {showProfile && (
-                  <div className="profile-dropdown">
-                    <div className="profile-header">
-                      <div className="user-avatar-large">
-                        {username ? username.charAt(0).toUpperCase() : "U"}
-                      </div>
-                      <div className="user-details">
-                        <div className="user-full-name">{username || "User"}</div>
-                        <div className="user-email-text">{userEmail}</div>
-                      </div>
-                    </div>
-                    <button className="logout-button" onClick={handleLogout}>
-                      Logout
-                    </button>
-                  </div>
-                )}
+          <button className="btn-icon-only">
+            <FaBell />
+          </button>
+
+          <div className="user-separator"></div>
+
+          {isLoggedIn ? (
+            <div
+              className="user-profile-section"
+              ref={profileRef}
+              onClick={() => setShowProfile(!showProfile)}
+            >
+              <div className="user-info-text">
+                <span className="user-greeting-small">Welcome,</span>
+                <span className="user-name-small">{username}</span>
               </div>
+              <div className="user-avatar-small">
+                <img src="https://i.pravatar.cc/150?img=3" alt="User" />
+              </div>
+
+              {showProfile && (
+                <div className="profile-dropdown">
+                  <div className="profile-header">
+                    <div className="user-details">
+                      <div className="user-full-name">{username}</div>
+                      <div className="user-email-text">{userEmail}</div>
+                    </div>
+                  </div>
+                  <button className="logout-button" onClick={handleLogout}>
+                    Logout
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
-            <NavLink to="/auth/login" className="signup-button">
-              Login
-            </NavLink>
+            <div className="auth-buttons">
+              <NavLink to="/auth/login" className="login-link">
+                Login
+              </NavLink>
+            </div>
           )}
         </div>
       </nav>

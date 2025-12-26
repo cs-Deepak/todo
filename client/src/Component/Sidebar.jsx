@@ -1,75 +1,120 @@
-import React from 'react';
-import './Sidebar.css';
-import { MdInbox, MdToday, MdUpcoming, MdFolder, MdLabel, MdArchive, MdSettings, MdHelp } from 'react-icons/md';
-import { FaTasks } from 'react-icons/fa';
-import { NavLink } from 'react-router-dom';
+import React from "react";
+import "./Sidebar.css";
+import {
+  MdCheckCircle,
+  MdCalendarToday,
+  MdFolder,
+  MdSettings,
+  MdDashboard,
+  MdInsertChartOutlined,
+} from "react-icons/md";
+import { NavLink, useNavigate } from "react-router-dom";
+import { FaCheckCircle } from "react-icons/fa";
 
-const Sidebar = ({ activeTab = 'today' }) => {
-    return (
-        <div className="sidebar">
-            <button className="mobile-close" onClick={() => { try { window.dispatchEvent(new CustomEvent('sidebar-toggle')); } catch (e) { const ev = document.createEvent('Event'); ev.initEvent('sidebar-toggle', true, true); window.dispatchEvent(ev); } }}>✕</button>
-            {/* <div className="sidebar-header">
-                <div className="logo-container">
-                    <FaTasks className="logo-icon" />
-                    <span className="logo-text">TaskFlow</span>
-                </div>
-            </div> */}
+const Sidebar = ({
+  activeTab = "my_tasks",
+  onSelect = () => {},
+  onClose = () => {},
+}) => {
+  const navigate = useNavigate();
+  const username = localStorage.getItem("username") || "Alex Morgan";
 
-            <nav className="sidebar-nav">
-                <div className="mobile-top-links">
-                    <NavLink to="/" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-                        <span className="nav-text">Home</span>
-                    </NavLink>
-                    <NavLink to="/dashboard" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-                        <span className="nav-text">Dashboard</span>
-                    </NavLink>
-                </div>
-                <div className="nav-section">
-                    <div className={`nav-item ${activeTab === 'inbox' ? 'active' : ''}`}>
-                        <MdInbox className="nav-icon" />
-                        <span className="nav-text">Inbox</span>
-                        <span className="nav-badge">3</span>
-                    </div>
+  const handleSelect = (key, route) => {
+    onSelect(key);
+    if (route) navigate(route);
+    onClose();
+  };
 
-                    <div className={`nav-item ${activeTab === 'today' ? 'active' : ''}`}>
-                        <MdToday className="nav-icon" />
-                        <span className="nav-text">Today</span>
-                    </div>
+  return (
+    <div className="sidebar" role="navigation" aria-label="Main sidebar">
+      <button
+        type="button"
+        className="mobile-close"
+        aria-label="Close sidebar"
+        onClick={onClose}
+      >
+        ✕
+      </button>
 
-                    <div className={`nav-item ${activeTab === 'upcoming' ? 'active' : ''}`}>
-                        <MdUpcoming className="nav-icon" />
-                        <span className="nav-text">Upcoming</span>
-                    </div>
+    
 
-                    <div className={`nav-item ${activeTab === 'projects' ? 'active' : ''}`}>
-                        <MdFolder className="nav-icon" />
-                        <span className="nav-text">Projects</span>
-                    </div>
+      <nav className="sidebar-nav">
+        <div className="nav-section">
+          {/* Dashboard (New) */}
+          {/* <button
+            type="button"
+            className={`nav-item ${activeTab === "dashboard" ? "active" : ""}`}
+            onClick={() => handleSelect("dashboard", "/dashboard")}
+          >
+            <MdDashboard className="nav-icon" />
+            <span className="nav-text">Dashboard</span>
+          </button> */}
 
-                    <div className={`nav-item ${activeTab === 'tags' ? 'active' : ''}`}>
-                        <MdLabel className="nav-icon" />
-                        <span className="nav-text">Tags</span>
-                    </div>
+          <button
+            type="button"
+            className={`nav-item ${activeTab === "my_tasks" ? "active" : ""}`}
+            onClick={() => handleSelect("my_tasks", "/dashboard")}
+          >
+            <MdCheckCircle className="nav-icon" />
+            <span className="nav-text">My Tasks</span>
+          </button>
 
-                    <div className={`nav-item ${activeTab === 'archived' ? 'active' : ''}`}>
-                        <MdArchive className="nav-icon" />
-                        <span className="nav-text">Archived</span>
-                    </div>
-                </div>
-            </nav>
+          {/* <button
+            type="button"
+            className={`nav-item ${activeTab === "calendar" ? "active" : ""}`}
+            onClick={() => handleSelect("calendar")}
+          >
+            <MdCalendarToday className="nav-icon" />
+            <span className="nav-text">Calendar</span>
+          </button> */}
 
-            <div className="sidebar-footer">
-                <div className="nav-item">
-                    <MdSettings className="nav-icon" />
-                    <span className="nav-text">Settings</span>
-                </div>
-                <div className="nav-item">
-                    <MdHelp className="nav-icon" />
-                    <span className="nav-text">Help & Feedback</span>
-                </div>
-            </div>
+          <button
+            type="button"
+            className={`nav-item ${activeTab === "projects" ? "active" : ""}`}
+            onClick={() => handleSelect("projects", "/projects")}
+          >
+            <MdFolder className="nav-icon" />
+            <span className="nav-text">Projects</span>
+          </button>
+
+          {/* Reports (New) */}
+          {/* <button
+            type="button"
+            className={`nav-item ${activeTab === "reports" ? "active" : ""}`}
+            onClick={() => handleSelect("reports")}
+          >
+            <MdInsertChartOutlined className="nav-icon" />
+            <span className="nav-text">Reports</span>
+          </button> */}
+
+          <button
+            type="button"
+            className={`nav-item ${activeTab === "settings" ? "active" : ""}`}
+            onClick={() => handleSelect("settings", "/setting")}
+          >
+            <MdSettings className="nav-icon" />
+            <span className="nav-text">Settings</span>
+          </button>
         </div>
-    );
+      </nav>
+
+      {/* User Profile Section */}
+      {/* <div className="sidebar-footer">
+        <div className="user-profile-card">
+          <div className="user-avatar">
+            <img
+              src={`https://ui-avatars.com/api/?name=${username}&background=random`}
+              alt="User"
+            />
+          </div>
+          <div className="user-info">
+            <span className="user-name">{username}</span>
+            <span className="user-plan">Pro Plan</span>
+          </div>
+        </div>
+      </div> */}
+    </div>
+  );
 };
 
 export default Sidebar;

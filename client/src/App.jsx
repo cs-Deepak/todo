@@ -1,18 +1,24 @@
-import { useState } from 'react';
-import './App.css';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { useState } from "react";
+import "./App.css";
+import { Routes, Route, useLocation } from "react-router-dom";
 
-import Home from './Component/Home';
-import Header from './Component/Headers';
-import Login from './Component/Login';
-import Signup from './Component/Signup';
-import Dashboard from './Component/Dashboard';
-import Error from './Component/Error';
-import Document from './Component/Document';
-import Chartbar from './Component/footer/Chartbar';
-import Linechart from './Component/footer/Linechart';
-import Setting from './Component/footer/Setting';
-import Zip from './Component/footer/Zip';
+import Home from "./Component/Home";
+import Header from "./Component/Headers";
+import Login from "./Component/Login";
+import Signup from "./Component/Signup";
+import Dashboard from "./Component/Dashboard";
+import Error from "./Component/Error";
+import Document from "./Component/Document";
+import Chartbar from "./Component/footer/Chartbar";
+import Linechart from "./Component/footer/Linechart";
+import Setting from "./Component/footer/Setting";
+import Zip from "./Component/footer/Zip";
+import Projects from "./Component/Projects";
+import TaskDetails from "./Component/TaskDetails";
+import ProjectDetails from "./Component/ProjectDetails";
+
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const location = useLocation();
@@ -20,13 +26,17 @@ function App() {
   return (
     <>
       {/* Hide header on login/signup */}
-      {location.pathname !== '/auth/login' && location.pathname !== '/auth/signup' && <Header />}
+      {location.pathname !== "/auth/login" &&
+        location.pathname !== "/auth/signup" && <Header />}
 
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/auth/login" element={<Login />} />
         <Route path="/auth/signup" element={<Signup />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/projects" element={<Projects />} />
+        <Route path="/task/:id" element={<TaskDetails />} />
+        <Route path="/project/:id" element={<ProjectDetails />} />
         <Route path="/document" element={<Document />} />
         <Route path="/chartbar" element={<Chartbar />} />
         <Route path="/linechart" element={<Linechart />} />
@@ -34,6 +44,7 @@ function App() {
         <Route path="/zip" element={<Zip />} />
         <Route path="*" element={<Error />} />
       </Routes>
+      <ToastContainer position="top-right" />
     </>
   );
 }
