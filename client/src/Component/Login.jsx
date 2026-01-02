@@ -56,16 +56,7 @@ function Login() {
 
   return (
     <div className="auth-container">
-      {/* Logo/Icon Section */}
-      <div className="auth-logo-section">
-        <div className="logo-icon-wrapper">
-          <FaCheck className="auth-logo-icon" />
-        </div>
-        <h1 className="auth-page-title">Welcome Back</h1>
-        <p className="auth-page-subtitle">
-          Log in to manage your tasks effectively
-        </p>
-      </div>
+ 
 
       <div className="auth-card">
         {/* Tabs */}
