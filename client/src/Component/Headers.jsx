@@ -1,18 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./header.css";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import {
+import { FaBell, FaBars, FaTimes } from "react-icons/fa";
 
-  FaBell,
-  FaBars,
-  FaTimes,
-  
-} from "react-icons/fa";
-
-import { 
-  IoLogOutOutline,
-  IoLogInOutline
- } from "react-icons/io5";
+import { IoLogOutOutline, IoLogInOutline } from "react-icons/io5";
 
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -109,7 +100,7 @@ const Header = () => {
                   <span className="user-name-small">{username}</span>
                 </div>
                 <div className="user-avatar-small">
-                  <img src="https://i.pravatar.cc/150?img=3" alt="User" />
+                  {username ? username.charAt(0).toUpperCase() : "U"}
                 </div>
               </div>
               <button
@@ -117,14 +108,13 @@ const Header = () => {
                 onClick={handleLogout}
                 title="Logout"
               >
-                <IoLogOutOutline size={24}/>
+                <IoLogOutOutline size={24} />
               </button>
             </>
           ) : (
             <div className="auth-buttons">
               <NavLink to="/auth/login" className="login-link">
-              <IoLogInOutline className="icon" size={24}/>
-             
+                <IoLogInOutline className="icon" size={24} />
               </NavLink>
             </div>
           )}
