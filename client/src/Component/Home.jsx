@@ -20,6 +20,15 @@ import { FaApple, FaGooglePlay, FaCheckCircle, FaStar } from "react-icons/fa";
 function Home() {
   const navigate = useNavigate();
 
+  const handleTryNow = () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/dashboard");
+    } else {
+      navigate("/auth/login");
+    }
+  };
+
   return (
     <div className="landing-page">
       <div className="hero-background-shape"></div>
@@ -48,11 +57,9 @@ function Home() {
               dark-mode-first design.
             </p>
             <div className="hero-buttons">
-              <button
-                className="btn-primary"
-                onClick={() => navigate("/auth/signup")}
-              >
-                <span className="icon"></span> Try Now      <MdArrowRight />        </button>
+              <button className="btn-primary" onClick={handleTryNow}>
+                <span className="icon"></span> Try Now <MdArrowRight />{" "}
+              </button>
               <button className="btn-secondary">
                 <MdPlayArrow size={20} /> Watch Video
               </button>
