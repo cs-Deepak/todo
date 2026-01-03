@@ -13,6 +13,23 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1.5rem;
+  position: relative; /* Ensure content sits above background shape */
+  z-index: 1;
+}
+
+/* --- Hero Background Shape --- */
+.hero-background-shape {
+  position: absolute;
+  top: -200px; /* Pull up to hide top part and show curve */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150vw; /* Make it wider than the screen */
+  height: 1000px;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(46, 209, 108, 0.15) 0%, rgba(5, 5, 5, 0) 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(80px); /* Soften the edges significantly */
 }
 
 /* --- Navigation --- */
@@ -455,6 +472,12 @@
 
 /* Responsive */
 @media (max-width: 900px) {
+  .hero-background-shape {
+    width: 200vw;
+    height: 800px;
+    top: -100px;
+    filter: blur(60px);
+  }
   .hero-section { flex-direction: column; text-align: center; }
   .hero-content { margin: 0 auto; }
   .hero-buttons { justify-content: center; }

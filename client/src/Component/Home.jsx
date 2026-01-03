@@ -1,5 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import dashboard from "../../public/img/dashboard.png";
+import calender from "../../public/img/calander.jpg";
+import Analytics from "../../public/img/Analytics.jpg";
 import "./home.css";
 import {
   MdCheckCircle,
@@ -10,6 +13,7 @@ import {
   MdBolt,
   MdDarkMode,
   MdAdd,
+  MdArrowRight,
 } from "react-icons/md";
 import { FaApple, FaGooglePlay, FaCheckCircle, FaStar } from "react-icons/fa";
 
@@ -18,10 +22,8 @@ function Home() {
 
   return (
     <div className="landing-page">
+      <div className="hero-background-shape"></div>
       <div className="container">
-    
-      
-
         {/* Hero Section */}
         <section className="hero-section">
           <div className="hero-content">
@@ -50,8 +52,7 @@ function Home() {
                 className="btn-primary"
                 onClick={() => navigate("/auth/signup")}
               >
-                <span className="icon">↓</span> Download Now
-              </button>
+                <span className="icon"></span> Try Now      <MdArrowRight />        </button>
               <button className="btn-secondary">
                 <MdPlayArrow size={20} /> Watch Video
               </button>
@@ -62,11 +63,9 @@ function Home() {
                 <div className="avatar"></div>
                 <div className="avatar"></div>
               </div>
-              <span className="trust-text">Joined by 20,000+ users</span>
+              {/* <span className="trust-text">Joined by 20,000+ users</span> */}
             </div>
           </div>
-
-          
         </section>
 
         {/* Features Section */}
@@ -136,9 +135,25 @@ function Home() {
                 style={{
                   background:
                     "linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "10px",
                 }}
-              ></div>{" "}
-              {/* Placeholder for image */}
+              >
+                <img
+                  src={dashboard}
+                  alt="Dashboard View"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                    borderRadius: "6px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  }}
+                />
+              </div>
+
               <div className="workflow-card-content">
                 <h3>Today View</h3>
                 <p style={{ fontSize: "0.85rem", color: "#ccc" }}>
@@ -153,7 +168,19 @@ function Home() {
                   background:
                     "linear-gradient(135deg, #e3c4a8 0%, #f5e4d3 100%)",
                 }}
-              ></div>
+              >
+                <img
+                  src={calender}
+                  alt="Dashboard View"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                    borderRadius: "6px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  }}
+                />
+              </div>
               <div className="workflow-card-content">
                 <h3>Calendar</h3>
                 <p style={{ fontSize: "0.85rem", color: "#ccc" }}>
@@ -164,8 +191,27 @@ function Home() {
             <div className="workflow-card">
               <div
                 className="card-bg-image"
-                style={{ background: "#0d1117" }}
-              ></div>
+                style={{
+                  background:
+                    "linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "10px",
+                }}
+              >
+                <img
+                  src={Analytics}
+                  alt="Dashboard View"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                    borderRadius: "6px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  }}
+                />
+              </div>
               <div className="workflow-card-content">
                 <h3>Analytics</h3>
                 <p style={{ fontSize: "0.85rem", color: "#ccc" }}>
