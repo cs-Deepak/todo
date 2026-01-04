@@ -1,8 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import dashboard from "../../public/img/dashboard.png";
-import calender from "../../public/img/calander.jpg";
-import Analytics from "../../public/img/Analytics.jpg";
+import dashboard from "../../public/img/f.png";
+import calender from "../../public/img/s.png";
+import Analytics from "../../public/img/t.png";
 import "./home.css";
 import {
   MdCheckCircle,
@@ -45,7 +45,8 @@ function Home() {
                   borderRadius: "50%",
                 }}
               ></span>
-              New iOS & Android App
+              Modern Web Productivity Tool
+
             </div>
             <h1 className="hero-title">
               Organize your <br />
@@ -233,22 +234,23 @@ function Home() {
         <section className="cta-section">
           <div className="cta-box">
             <div className="cta-content">
-              <h2 className="cta-title">Ready to get started?</h2>
+              <h2 className="cta-title">Ready to organize your tasks?</h2>
               <p className="cta-desc">
-                Join thousands of productive people. Download TaskMaster on iOS
-                or Android today.
+                Start managing your daily tasks smarter.
+                Simple, fast and built for productivity.
               </p>
               <div className="cta-buttons">
-                <button className="store-btn">
-                  <FaApple size={20} /> App Store
+
+                     
+
+                <button className="store-btn" onClick={handleTryNow}>
+                  Start Using TaskMaster
                 </button>
-                <button className="store-btn">
-                  <FaGooglePlay size={18} /> Play Store
-                </button>
+              
               </div>
             </div>
 
-            <div className="qr-card">
+            {/* <div className="qr-card">
               <div className="qr-code-placeholder">
                 <div className="qr-block"></div>
                 <div className="qr-block"></div>
@@ -268,7 +270,7 @@ function Home() {
               <div style={{ marginTop: "10px", color: "#2ed16c" }}>
                 <FaCheckCircle />
               </div>
-            </div>
+            </div> */}
           </div>
         </section>
 
@@ -286,7 +288,7 @@ function Home() {
           >
             <FaCheckCircle /> TaskMaster
           </div>
-          <p>© 2024 TaskMaster Inc. Built for focus.</p>
+          <p>© 2026 TaskMaster Inc. Built for focus.</p>
         </footer>
       </div>
     </div>

@@ -58,8 +58,11 @@ const Header = () => {
 
         {/* Brand */}
         <div className="header-brand" onClick={() => navigate("/")}>
-          <div className="brand-logo-container"></div>
-          <span className="brand-name">TaskMaster</span>
+          <img
+            src="/img/logo.png"
+            alt="TaskMaster Logo"
+            className="brand-logo"
+          />
         </div>
 
         {/* Center Navigation Pills */}
@@ -86,9 +89,9 @@ const Header = () => {
 
         {/* Right Actions */}
         <div className="header-actions">
-          <button className="btn-icon-only">
+          {/* <button className="btn-icon-only">
             <FaBell />
-          </button>
+          </button> */}
 
           <div className="user-separator"></div>
 
